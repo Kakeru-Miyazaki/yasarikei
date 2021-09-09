@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>その他</title>
+    <title>おすすめの本</title>
     <link rel="stylesheet" href="https://unpkg.com/ress/dist/ress.min.css">
     <meta name="description" content="分かった気になるやさしい理系の世界">
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -29,7 +29,7 @@
         </header>
 
         <div class="wrapper">
-            <h2 class="page-title">その他</h2>
+            <h2 class="page-title">おすすめの本</h2>
         </div>
     </div><!-- /#daigaku-->
 
@@ -39,7 +39,7 @@
     <div class="news-contents wrapper">
        
         <article>
-            <p>ジャンル問わずその他を紹介します。</p>
+            <p>ジャンル問わずおすすめの本を紹介します。</p>
             <p>ただの備忘録です。</p>
         
     
@@ -51,7 +51,7 @@
                 <li><a href="../che/che.html">化学</a></li>
                 <li><a href="../gakusan/gakusan.html">おすすめの高校学参（数学以外）</a></li>
                 <li><a href="../u-math/u-math.html">大学数学</a></li>
-                <li><a href="../book/book.html">その他</a></li>
+                <li><a href="../book/book.html">おすすめの本</a></li>
             </ul>
         </aside>
 
