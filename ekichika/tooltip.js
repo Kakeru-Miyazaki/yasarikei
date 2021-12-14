@@ -1,6 +1,5 @@
 function showStaionTooltip(event){
-    var stationTooltip = svg.selectAll()
-    console.log(d3.select(this));
+    //console.log(d3.select(this));
 
     var data_stationTooltip = [d3.select(this).datum().GroupID, d3.select(this).datum().name]
     circle_cx = d3.select(this).attr("cx")
@@ -9,12 +8,12 @@ function showStaionTooltip(event){
 
     y_col = circle_cy - circle_r
 
-    var stationTooltip = svg.selectAll(".stationTooltip")
+    var stationTooltip = d3.select(this).selectAll(".stationTooltip")
         .data(data_stationTooltip)
         .enter()
         .append("g")
         .attr("class", "stationTooltip")
-        .attr("transform", "translate("+ circle_cx +","+ circle_cy +")");
+        .attr("transform", "translate("+ 0 +","+ 0 +")");
     stationTooltip.append("text")
         .attr("class", "stationTooltipText")
         .attr("fill", "black")
@@ -22,17 +21,25 @@ function showStaionTooltip(event){
         .attr("text-anchor", "end")
         .attr("x", 0)
         .attr("y", function(d, i){return 10 * i;})
-        .attr("font-size", 10)
+        .attr("font-size", 100)
         .text(function(d){return d; });
+    /*
     stationTooltip.append("rect")
         .attr("class", "stationTooltipBg")
-        .attr("width", 200)
-        .attr("heght", 200)
+        .attr("width", 2000)
+        .attr("height", 2000)
         .attr("x", 0)
         .attr("y", 0)
-        .attr("fill", "white")
+        .attr("fill", "yellow")
         .attr("stroke", "black");
-    stationTooltip.append("rect")
+    console.log("stationTooltip", stationTooltip.selectAll("rect"));
+    //stationTooltip.on("zoom", resizeStationTooltip);
+    */
+    console.log("stationTooltip", stationTooltip.selectAll("text"));
+
+    function resizeStationTooltip(event){
+        d3.selectAll()
+    }
 }
 function hideStationTooltip(event){
 //d3.select(this).attr("fill", function (d){ return color(d.region)})

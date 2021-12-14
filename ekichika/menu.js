@@ -1,23 +1,25 @@
-onMenuChange();
+// onMenuChange();
 
 
 function onMenuChange() {
+  // var mode;
+  reset_selections();
   let elems = document.getElementsByName("radio");
-  let val = "";
+  // let val = "";
 
   for (let i = 0; i < elems.length; i++) {
     if (elems[i].checked) {
-      val = elems[i].value;
+      mode = elems[i].value;
     }
   } // end for i
 
-  console.log(val);
+  console.log(mode);
 
-  if (val == "one") {
+  if (mode == "one") {
     document.getElementById("clockAndTime").style.display = "block";
-  } else if (val == "meet") {
+  } else if (mode == "meet") {
     document.getElementById("clockAndTime").style.display = "none";
-  } else if (val == "meetWithTime") {
+  } else if (mode == "meetWithTime") {
     document.getElementById("clockAndTime").style.display = "block";
   }
 }

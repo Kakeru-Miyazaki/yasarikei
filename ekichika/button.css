@@ -9,6 +9,7 @@ html {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   font-size: 62.5%;
+  /* font-family: "Ubuntu", sans-serif; */
 }
 
 /* body {
@@ -41,7 +42,7 @@ button.btn {
 
 a.btn-svg {
   /* font-family: 'Lora', serif; */
-  font-weight: 100;
+  font-weight: 500;
   line-height: 54px;
 
   width: 204px;
@@ -79,4 +80,8 @@ a.btn-svg:hover svg rect {
 
 a.btn-svg span {
   color: #fff;
+}
+
+#search {
+  float: right;
 }

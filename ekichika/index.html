@@ -44,6 +44,7 @@
 <link rel="stylesheet" href="form.css" />
 <link rel="stylesheet" href="clock.css" />
 <link rel="stylesheet" href="menu.css" />
+<link rel="stylesheet" href="search.css" />
 <body bgcolor="black">
   <!-- >>> for sidebar >>> -->
   <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu" checked />
@@ -53,23 +54,24 @@
     <div class="spinner diagonal part-2"></div>
   </label>
   <div id="sidebarMenu">
-    <div class="wrapper">
-      <!-- >>> for search >>> -->
+    <!-- <div class="wrapper"> -->
+    <!-- >>> for search >>> -->
 
-      <div class="cp_iptxt">
+    <!-- <div class="cp_iptxt">
         <input class="ef" type="text" placeholder="" id="inputEkiname" />
         <label>Station Name</label>
         <span class="focus_line"></span>
       </div>
 
-      <br />
-      <a href="javascript:ekiSearch();" class="btn btn-svg">
+      <a href="javascript:ekiSearch();" class="btn btn-svg" id="search">
         <svg>
           <rect x="2" y="2" rx="0" fill="none" width="200" height="50"></rect>
         </svg>
         <span>SEARCH</span>
       </a>
-    </div>
+      <br /> -->
+
+    <!-- </div> -->
     <!-- <<< for search <<< -->
 
     <!-- >>> for menu >>> -->
@@ -131,6 +133,12 @@
 
     <!-- >>> for clock >>> -->
     <div class="wrapper">
+      <a href="javascript:run();" class="btn btn-svg">
+        <svg>
+          <rect x="2" y="2" rx="0" fill="none" width="200" height="50"></rect>
+        </svg>
+        <span>RUN</span>
+      </a>
       <div id="clockAndTime">
         <div class="clock" id="clock" draggable="true">
           <div class="scale" id="scale"></div>
@@ -140,23 +148,22 @@
         <div id="setTime" class="wrapper"></div>
         <br />
       </div>
-      <a href="javascript:show_whole_paths();" class="btn btn-svg">
-        <svg>
-          <rect x="2" y="2" rx="0" fill="none" width="200" height="50"></rect>
-        </svg>
-        <span>RUN</span>
-      </a>
     </div>
     <!-- <<< for clock <<< -->
+
+    <div class="search">
+      <input type="text" placeholder="Station Name" id="inputEkiname" />
+      <button onclick="ekiSearch()" id="search">＞</button>
+    </div>
   </div>
 
   <!-- <<< for sidebar <<< -->
   <script src="./d3.js" charset="utf-8"></script>
   <script src="//d3js.org/topojson.v1.min.js"></script>
   <script src="./search.js"></script>
-  <script src="./menu.js"></script>
   <script src="./clock.js"></script>
   <script src="./tooltip.js"></script>
+  <script src="./menu.js"></script>
   <script>
     var w = window,
       d = document,
@@ -170,11 +177,10 @@
     var stationQueue = [];
     var ekiNameToEkiData = {};
     var clicked_stations = new Set();
+    var clicked_stations_names = new Set();
     var goal_station_name_ID = [];
-    var last_center_station = NaN;
-    var last_center_station_red_flag = 0;
-    var last_nearest_station = NaN;
-    var last_nearest_station_red_flag = 0;
+
+    var mode = "one";
 
     d3.select(window).on("resize", resizing);
 
@@ -244,6 +250,7 @@
         .ease(d3.easeLinear)
         .attr("opacity", 1);
       clicked_stations.clear();
+      clicked_stations_names.clear();
       last_center_station = NaN;
     }
 
@@ -372,236 +379,110 @@
       }
 
       circle.on("click", function (event, d) {
-        d3.select(this)
-          .transition()
-          .duration(500)
-          .ease(d3.easeLinear)
-          .attr("fill-opacity", 1)
-          .attr("fill", "red");
+        if (mode == "one") {
+          g.selectAll("circle")
+            .transition()
+            .duration(500)
+            .ease(d3.easeLinear)
+            .attr("fill-opacity", 0.2)
+            .attr("fill", "white");
+          g.selectAll(".wave").remove();
+          d3.select(this)
+            .transition()
+            .duration(500)
+            .ease(d3.easeLinear)
+            .attr("fill-opacity", 1)
+            .attr("fill", "red");
 
-        var circle_cx = d3.select(this).attr("cx");
-        var circle_cy = d3.select(this).attr("cy");
-        var circle_transform = d3.select(this).attr("transform");
-        var kakudairitu = 0.2 / d3.select(this).attr("stroke-width");
-        // 選択した駅から波動を発生させる
-        var wave = g
-          .append("circle")
-          .attr("class", "wave wave_out")
-          .attr("stroke", "white")
-          .attr("stroke-width", 0.2)
-          .attr("opacity", 1)
-          .attr("fill-opacity", 0)
-          .attr("cx", circle_cx)
-          .attr("cy", circle_cy)
-          .attr("r", 0)
-          .attr("transform", circle_transform);
+          var circle_cx = d3.select(this).attr("cx");
+          var circle_cy = d3.select(this).attr("cy");
+          var circle_transform = d3.select(this).attr("transform");
+          var kakudairitu = 0.2 / d3.select(this).attr("stroke-width");
+          // 選択した駅から波動を発生させる
+          var wave = g
+            .append("circle")
+            .attr("class", "wave wave_out")
+            .attr("stroke", "white")
+            .attr("stroke-width", 0.2)
+            .attr("opacity", 1)
+            .attr("fill-opacity", 0)
+            .attr("cx", circle_cx)
+            .attr("cy", circle_cy)
+            .attr("r", 0)
+            .attr("transform", circle_transform);
 
-        wave
-          .append("animate")
-          .attr("class", "wave_out_animation")
-          .attr("attributeName", "r")
-          .attr("begin", "0s")
-          .attr("dur", "1s")
-          .attr("from", "0")
-          .attr("to", "25")
-          .attr("repeatCount", "indefinite");
+          wave
+            .append("animate")
+            .attr("class", "wave_out_animation")
+            .attr("attributeName", "r")
+            .attr("begin", "0s")
+            .attr("dur", "1s")
+            .attr("from", "0")
+            .attr("to", "25")
+            .attr("repeatCount", "indefinite");
 
-        console.log(d);
-        clicked_stations.add(d.GroupID);
-        console.log(clicked_stations);
+          console.log(d);
+          clicked_stations.clear(); //空にする
+          clicked_stations_names.clear();
+          clicked_stations.add(d.GroupID);
+          clicked_stations_names.add(d.name + d.GroupID);
+          console.log(clicked_stations);
+          console.log(clicked_stations_names);
+        } else {
+          d3.select(this)
+            .transition()
+            .duration(500)
+            .ease(d3.easeLinear)
+            .attr("fill-opacity", 1)
+            .attr("fill", "red");
+
+          var circle_cx = d3.select(this).attr("cx");
+          var circle_cy = d3.select(this).attr("cy");
+          var circle_transform = d3.select(this).attr("transform");
+          var kakudairitu = 0.2 / d3.select(this).attr("stroke-width");
+          // 選択した駅から波動を発生させる
+          var wave = g
+            .append("circle")
+            .attr("class", "wave wave_out")
+            .attr("stroke", "white")
+            .attr("stroke-width", 0.2)
+            .attr("opacity", 1)
+            .attr("fill-opacity", 0)
+            .attr("cx", circle_cx)
+            .attr("cy", circle_cy)
+            .attr("r", 0)
+            .attr("transform", circle_transform);
+
+          wave
+            .append("animate")
+            .attr("class", "wave_out_animation")
+            .attr("attributeName", "r")
+            .attr("begin", "0s")
+            .attr("dur", "1s")
+            .attr("from", "0")
+            .attr("to", "25")
+            .attr("repeatCount", "indefinite");
+
+          console.log(d);
+          clicked_stations.add(d.GroupID);
+          clicked_stations_names.add(d.name + d.GroupID);
+          console.log(clicked_stations);
+          console.log(clicked_stations_names);
+        }
       });
-      //circle.on("mouseover", showStaionTooltip)
-      //          .on("mouseout", hideStationTooltip);
-    }
 
-    //runされた時呼び出される関数
-    function show_whole_paths() {
-      if (clicked_stations.size == 0) {
-        // 何も選択せずにrunされた時
-        console.log("no stations selected!");
-        return;
-      } else if (clicked_stations.size == 1) {
-        //一回の時
-        console.log("selected one station");
-        d3.selectAll("line")
-          .transition()
-          .duration(500)
-          .ease(d3.easeLinear)
-          .attr("opacity", 0);
-        for (var value of clicked_stations) {
-          show_within_stations(value);
-        }
-      } else {
-        console.log("selected more than one station");
-        d3.selectAll("line")
-          .transition()
-          .duration(500)
-          .ease(d3.easeLinear)
-          .attr("opacity", 0);
-        show_center_station();
-      }
-    }
-
-    //ある駅からn分以内に行ける駅を表示する関数
-    function show_within_stations(groupid) {
-      within_T_min(groupid, userSetHour * 60 + userSetTime, stationQueue).then(
-        () => {
-          while (stationQueue.length) {
-            var rinsetsu_stations = stationQueue.shift();
-            g.select(".s" + rinsetsu_stations[0] + "_" + rinsetsu_stations[1])
-              .transition()
-              .duration(500)
-              .ease(d3.easeLinear)
-              .attr("opacity", 1);
-          }
-        }
-      );
-    }
-
-    //複数人で待ち合わせを表示する関数
-    function show_center_station() {
-      meet_up(clicked_stations, 180, stationQueue, goal_station_name_ID).then(
-        () => {
-          while (stationQueue.length) {
-            var rinsetsu_stations = stationQueue.shift();
-            g.select(".s" + rinsetsu_stations[0] + "_" + rinsetsu_stations[1])
-              .transition()
-              .duration(500)
-              .ease(d3.easeLinear)
-              .attr("opacity", 1);
-          }
-          if (goal_station_name_ID.length > 0) {
-            // center_stationは駅名+グループID
-            console.log(goal_station_name_ID);
-            var center_station = goal_station_name_ID.shift();
-
-            if (last_center_station != NaN) {
-              if (last_center_station_red_flag == 1) {
-                g.select("#" + last_center_station)
-                  .attr("fill-opacity", 1)
-                  .attr("fill", "red");
-              } else {
-                g.select("#" + last_center_station)
-                  .transition()
-                  .duration(500)
-                  .ease(d3.easeLinear)
-                  .attr("fill-opacity", 0.2)
-                  .attr("fill", "white");
-              }
-              g.select(".wave_in").remove();
-            }
-            console.log(g.select("#" + center_station).attr("fill"));
-            console.log(last_nearest_station_red_flag);
-            if (
-              g.select("#" + center_station).attr("fill") == "rgb(255, 0, 0)" ||
-              g.select("#" + center_station).attr("fill") == "red" ||
-              (g.select("#" + center_station).attr("fill") ==
-                "rgb(148, 0, 211)" &&
-                last_nearest_station_red_flag == 1)
-            ) {
-              console.log("conter_station_red !!");
-              last_center_station_red_flag = 1;
-            } else {
-              console.log("conter_station_not_red !!");
-              last_center_station_red_flag = 0;
-            }
-            g.select("#" + center_station)
-              .transition()
-              .duration(500)
-              .ease(d3.easeLinear)
-              .attr("fill-opacity", 1)
-              .attr("fill", "lime");
-            last_center_station = center_station;
-            var circle_cx = d3.select("#" + center_station).attr("cx");
-            var circle_cy = d3.select("#" + center_station).attr("cy");
-            var circle_transform = d3
-              .select("#" + center_station)
-              .attr("transform");
-            var kakudairitu =
-              0.2 / d3.select("#" + center_station).attr("stroke-width");
-            g.selectAll(".wave_out_animation").attr("to", 8);
-
-            var wave = g
-              .append("circle")
-              .attr("stroke", "white")
-              .attr("stroke-width", 0.2)
-              .attr("class", "wave wave_in")
-              .attr("opacity", 1)
-              .attr("fill-opacity", 0)
-              .attr("cx", circle_cx)
-              .attr("cy", circle_cy)
-              .attr("r", 0)
-              .attr("transform", circle_transform);
-
-            wave
-              .append("animate")
-              .attr("attributeName", "r")
-              .attr("begin", "0s")
-              .attr("dur", "1s")
-              .attr("from", "25")
-              .attr("to", "0")
-              .attr("repeatCount", "indefinite");
-
-            if (last_nearest_station != NaN) {
-              if (last_nearest_station_red_flag == 1) {
-                g.select("#" + last_nearest_station)
-                  .attr("fill-opacity", 1)
-                  .attr("fill", "red");
-              } else {
-                g.select("#" + last_nearest_station)
-                  .transition()
-                  .duration(500)
-                  .ease(d3.easeLinear)
-                  .attr("fill-opacity", 0.2)
-                  .attr("fill", "white");
-              }
-            }
-
-            //ハブ駅の表示
-            if (goal_station_name_ID.length > 0) {
-              var nearest_hub_station = goal_station_name_ID.shift();
-              // if (last_nearest_station != NaN) {
-              //   console.log(last_nearest_station_red_flag);
-              //   if (last_nearest_station_red_flag == 1) {
-              //     g.select("#" + last_nearest_station)
-              //       .attr("fill-opacity", 1)
-              //       .attr("fill", "red");
-              //   } else {
-              //     g.select("#" + last_nearest_station)
-              //       .transition()
-              //       .duration(500)
-              //       .ease(d3.easeLinear)
-              //       .attr("fill-opacity", 0.2)
-              //       .attr("fill", "white");
-              //   }
-              //   // g.select(".wave_in").remove();
-              // }
-              console.log(g.select("#" + nearest_hub_station).attr("fill"));
-              if (
-                g.select("#" + nearest_hub_station).attr("fill") ==
-                  "rgb(255, 0, 0)" ||
-                g.select("#" + nearest_hub_station).attr("fill") == "red" ||
-                (g.select("#" + center_station).attr("fill") ==
-                  "rgb(0, 255, 0)" &&
-                  last_center_station_red_flag == 1)
-              ) {
-                console.log("hub_station_red !!");
-                last_nearest_station_red_flag = 1;
-              } else {
-                console.log("hub_station_not_red !!");
-                last_nearest_station_red_flag = 0;
-              }
-              g.select("#" + nearest_hub_station)
-                .transition()
-                .duration(500)
-                .ease(d3.easeLinear)
-                .attr("fill-opacity", 1)
-                .attr("fill", "darkviolet");
-              last_nearest_station = nearest_hub_station;
-            }
-          }
-        }
-      );
+      // circle
+      //   .append("text")
+      //   .attr({
+      //     // 真ん中若干下に配置されるように、文字色は白に。
+      //     "text-anchor": "middle",
+      //     dy: ".35em",
+      //     fill: "white",
+      //   })
+      //   // iは0から始まるので、+1しておく
+      //   .text(function (d) {
+      //     return d.name;
+      //   });
     }
 
     function resizing() {
@@ -614,12 +495,12 @@
       svg.selectAll(".background").attr("width", width).attr("height", height);
     }
 
-    function openGoogleMap(d) {
-      window.open(
-        "https://www.google.co.jp/maps/search/%E3%83%AC%E3%82%B9%E3%83%88%E3%83%A9%E3%83%B3+" +
-          d.name
-      );
-    }
+    // function openGoogleMap(d) {
+    //   window.open(
+    //     "https://www.google.co.jp/maps/search/%E3%83%AC%E3%82%B9%E3%83%88%E3%83%A9%E3%83%B3+" +
+    //       d.name
+    //   );
+    // }
 
     var isAleradySearched = false;
     function ekiSearch() {
@@ -669,6 +550,16 @@
       return;
     }
 
+    function run() {
+      if (mode == "one") {
+        single_person();
+      } else if (mode == "meet") {
+        multi_person();
+      } else if (mode == "meetWithTime") {
+        multi_person_within_time();
+      }
+    }
+
     document.getElementById("inputEkiname").addEventListener("keydown", (e) => {
       if (e.keyCode == 13) {
         ekiSearch();
@@ -678,4 +569,7 @@
       }
     });
   </script>
+  <script src="./single_person.js"></script>
+  <script src="./multi_person.js"></script>
+  <script src="./multi_person_within_time.js"></script>
 </body>
