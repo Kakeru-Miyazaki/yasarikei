@@ -45,6 +45,7 @@
 <link rel="stylesheet" href="clock.css" />
 <link rel="stylesheet" href="menu.css" />
 <link rel="stylesheet" href="search.css" />
+<link rel="stylesheet" href="modal.css" />
 <body bgcolor="black">
   <!-- >>> for sidebar >>> -->
   <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu" checked />
@@ -157,7 +158,52 @@
         <img src="fig/search2.png" width="20px" height="20px" />
       </button>
     </div>
+    <div id="open">How to Use</div>
   </div>
+
+  <div id="mask" class="hidden"></div>
+  <section id="modal1" class="hidden modal">
+    <p>
+      <strong>使い方</strong><br />
+      1. スタートにしたい駅をクリックする．<br />
+      2. マウスを使って時計をセッティングする．<br />
+      3. RUNボタンを押す．<br />
+      <br />
+      設定した時間内にスタートから到達できる駅が表示されます．
+    </p>
+    <div id="close1" class="close">Close</div>
+  </section>
+  <section id="modal2" class="hidden modal">
+    <p>
+      <strong>使い方</strong><br />
+      1. 集合したい人の最寄り駅をクリックする．<br />
+      2. RUNボタンを押す．<br />
+      <br />
+      選択された各駅から集まるのに適した駅が表示されます．<br />
+      このとき，<br><strong
+        ><span class="textGreen">黄緑色</div>
+      </strong>
+        で表示されるのが最も早く集合できる駅で，
+        <strong>
+        <span class="textPuple">紫色</div>
+        </strong
+      >
+        で表示されるのが全員が集まりやすい大きな駅となっています．
+    </p>
+    <div id="close2" class="close">Close</div>
+  </section>
+  <section id="modal3" class="hidden modal">
+    <p>
+      <strong>使い方</strong><br />
+      1. 集合したい人の最寄り駅をクリックする．<br />
+      2. マウスを使って時計をセッティングする．<br />
+      3. RUNボタンを押す．<br />
+      <br />
+      選ばれた駅からスタートした各人が設定された時間以下の移動で合流可能となる駅が表示されます．<br />
+    </p>
+    </p>
+    <div id="close3" class="close">Close</div>
+  </section>
 
   <!-- <<< for sidebar <<< -->
   <script src="./d3.js" charset="utf-8"></script>
@@ -181,6 +227,10 @@
     var clicked_stations = new Set();
     var clicked_stations_names = new Set();
     var goal_station_name_ID = [];
+    var last_center_station = NaN;
+    var last_center_station_red_flag = 0;
+    var last_nearest_station = NaN;
+    var last_nearest_station_red_flag = 0;
 
     var mode = "one";
 
@@ -472,19 +522,8 @@
           console.log(clicked_stations_names);
         }
       });
-
-      // circle
-      //   .append("text")
-      //   .attr({
-      //     // 真ん中若干下に配置されるように、文字色は白に。
-      //     "text-anchor": "middle",
-      //     dy: ".35em",
-      //     fill: "white",
-      //   })
-      //   // iは0から始まるので、+1しておく
-      //   .text(function (d) {
-      //     return d.name;
-      //   });
+      //circle.on("mouseover", showStaionTooltip)
+      //          .on("mouseout", hideStationTooltip);
     }
 
     function resizing() {
@@ -574,4 +613,5 @@
   <script src="./single_person.js"></script>
   <script src="./multi_person.js"></script>
   <script src="./multi_person_within_time.js"></script>
+  <script src="./modal.js"></script>
 </body>
