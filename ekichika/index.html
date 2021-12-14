@@ -50,7 +50,7 @@
 <link rel="stylesheet" href="clock.css" />
 <body bgcolor="black">
   <!-- >>> for sidebar >>> -->
-  <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu" />
+  <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu" checked />
   <label for="openSidebarMenu" class="sidebarIconToggle">
     <div class="spinner diagonal part-1"></div>
     <div class="spinner horizontal"></div>
@@ -188,44 +188,48 @@
       last_center_station = NaN;
     }
 
-    showMap().then(() =>{
-      d3.csv("joinWithIdoKeido.csv").then(function (data){
-        showline(data);
-      }).then(() => {
-        d3.csv("data.csv").then(function (data) {
-          data.forEach(function (d) {
-            ekiNameToEkiData[d.name] = d;
+    showMap().then(() => {
+      d3.csv("joinWithIdoKeido.csv")
+        .then(function (data) {
+          showline(data);
+        })
+        .then(() => {
+          d3.csv("data.csv").then(function (data) {
+            data.forEach(function (d) {
+              ekiNameToEkiData[d.name] = d;
+            });
+            showCircle(data);
           });
-          showCircle(data);
         });
-      });
     });
 
     function showMap() {
-      return new Promise(resolve => {
-        d3.json("./tokyo.topojson").then(function (tk) {
-          var tokyo = topojson.feature(tk, tk.objects.tokyo);
-          g.append("g")
-            .attr("id", "states")
-            .selectAll("path")
-            .data(tokyo.features)
-            .enter()
-            .append("path")
-            .attr("d", path);
-          // .on("click", clicked);
+      return new Promise((resolve) => {
+        d3.json("./tokyo.topojson")
+          .then(function (tk) {
+            var tokyo = topojson.feature(tk, tk.objects.tokyo);
+            g.append("g")
+              .attr("id", "states")
+              .selectAll("path")
+              .data(tokyo.features)
+              .enter()
+              .append("path")
+              .attr("d", path);
+            // .on("click", clicked);
 
-          g.append("path")
-            .datum(
-              topojson.mesh(tk, tk.objects.tokyo, function (a, b) {
-                return a !== b;
-              })
-            )
-            .attr("id", "state-borders")
-            .attr("stroke-width", 1.5)
-            .attr("d", path);
-        }).then(() => {
-          resolve(true)
-        });
+            g.append("path")
+              .datum(
+                topojson.mesh(tk, tk.objects.tokyo, function (a, b) {
+                  return a !== b;
+                })
+              )
+              .attr("id", "state-borders")
+              .attr("stroke-width", 1.5)
+              .attr("d", path);
+          })
+          .then(() => {
+            resolve(true);
+          });
       });
     }
 
