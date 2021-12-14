@@ -1,7 +1,7 @@
 //search.js
 /*
 引数: stationQueue 空の配列の参照　→　表示するルートが随時pushされる.
-引数: goalStationNameID 空の配列の参照  → 集合地点の "名前+ID" がプッシュされる.
+引数: goalStationNameID 空の配列の参照  → 集合地点の "名前+GROUPID" がプッシュされる.
 
 =============使い方============
 
@@ -160,22 +160,29 @@ async function within_T_min(startGroupID, T, stationQueue) {
         });
     }
 }
-async function meet_up(startGroupID, T, stationQueue, goalStationNameID){
-    var N = startGroupID.length;
+async function meet_up(startGroupID_set, T, stationQueue, goalStationNameID){
+    var N = startGroupID_set.size;
     var Adj_list = {};
     var groupInfo = {};
     var numOfVisitors = {};
     var stationInfo = {};
+    var meetupFlag = {nearest: false, hub: false};
 
     //以下の変数は人数分準備
     var time = Array(N);
     var previousStation = Array(N);
     var visited_group_flag = Array(N);    //訪問済みならtrue 未訪問はfalse groupID
+    var startGroupID = Array(N);
 
     for(var i = 0; i < N; i++){
         time[i] = {};
         previousStation[i] = {};
         visited_group_flag[i] = {};
+    }
+    var counter = 0
+    for (var value of startGroupID_set) {
+        startGroupID[counter] = value;
+        counter++;
     }
 
     var queue = new pairing_heap();
@@ -183,6 +190,7 @@ async function meet_up(startGroupID, T, stationQueue, goalStationNameID){
     var ARAKAWASEN = 0.8;
     var changeTrains_time = 5;
     var stopTime = 0.75;
+    var hubStationThreshold = 3;
     
     //実際の処理
    await Make_Adj_List_meetup();
@@ -304,8 +312,22 @@ async function meet_up(startGroupID, T, stationQueue, goalStationNameID){
                         //全員集合してたら
                         //console.log("集合場所", groupInfo[currentGroupID]);
                         //return traceBack(currentGroupID);
-                        traceBack(currentGroupID);
-                        break;
+                        var noriire = groupInfo[currentGroupID].length;
+                        console.log(noriire)
+                        if(meetupFlag.nearest == false){
+                            meetupFlag.nearest = true;
+                            if(noriire >= hubStationThreshold){
+                                meetupFlag.hub = true;
+                            }
+                            traceBack(currentGroupID);
+                        }else if(meetupFlag.hub == false && noriire >= hubStationThreshold){
+                            meetupFlag.hub = true;
+                            traceBack(currentGroupID);
+                        }
+                        console.log(meetupFlag);
+                        if(meetupFlag.nearest && meetupFlag.hub){
+                            break;
+                        }
                     }
                 }
                 for(var j = 0; j < Adj_list[currentStationID].length; j++){

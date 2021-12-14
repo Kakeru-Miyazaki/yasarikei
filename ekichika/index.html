@@ -32,12 +32,7 @@
     pointer-events: none;
   }
 </style>
-<!-- <link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-  href="https://fonts.googleapis.com/css2?family=Lora&display=swap"
-  rel="stylesheet"
-/> -->
+
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
@@ -48,6 +43,7 @@
 <link rel="stylesheet" href="button.css" />
 <link rel="stylesheet" href="form.css" />
 <link rel="stylesheet" href="clock.css" />
+<link rel="stylesheet" href="menu.css" />
 <body bgcolor="black">
   <!-- >>> for sidebar >>> -->
   <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu" checked />
@@ -65,7 +61,6 @@
         <label>Station Name</label>
         <span class="focus_line"></span>
       </div>
-      <!-- <div id="errorDiv">hogehoge</div> -->
 
       <br />
       <a href="javascript:ekiSearch();" class="btn btn-svg">
@@ -76,24 +71,82 @@
       </a>
     </div>
     <!-- <<< for search <<< -->
+
+    <!-- >>> for menu >>> -->
+    <div class="container">
+      <div class="radio-tile-group">
+        <!-- <form name="formMenu"> -->
+        <div class="input-container">
+          <input
+            id="one"
+            class="radio-button"
+            type="radio"
+            name="radio"
+            checked
+            value="one"
+            onchange="onMenuChange()"
+          />
+          <div class="radio-tile">
+            <div class="icon one-icon">
+              <img src="./fig/one_.png" width="30" height="30" />
+            </div>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <input
+            id="meet"
+            class="radio-button"
+            type="radio"
+            name="radio"
+            value="meet"
+            onchange="onMenuChange()"
+          />
+          <div class="radio-tile">
+            <div class="icon meet-icon">
+              <img src="./fig/meet_.png" width="50" height="23" />
+            </div>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <input
+            id="meetWithTime"
+            class="radio-button"
+            type="radio"
+            name="radio"
+            value="meetWithTime"
+            onchange="onMenuChange()"
+          />
+          <div class="radio-tile">
+            <div class="icon car-icon">
+              <img src="./fig/meetWithTime_.png" width="45" height="36" />
+            </div>
+          </div>
+        </div>
+        <!-- </form> -->
+      </div>
+    </div>
+    <!-- <<< for menu <<< -->
+
     <!-- >>> for clock >>> -->
     <div class="wrapper">
-      <div class="clock" id="clock" draggable="true">
-        <div class="scale" id="scale"></div>
-        <div class="hour line"></div>
-        <div class="min line" draggable="true" id="minLine"></div>
+      <div id="clockAndTime">
+        <div class="clock" id="clock" draggable="true">
+          <div class="scale" id="scale"></div>
+          <div class="hour line"></div>
+          <div class="min line" draggable="true" id="minLine"></div>
+        </div>
+        <div id="setTime" class="wrapper"></div>
+        <br />
       </div>
-      <div id="setTime"></div>
-      <br />
       <a href="javascript:show_whole_paths();" class="btn btn-svg">
         <svg>
           <rect x="2" y="2" rx="0" fill="none" width="200" height="50"></rect>
         </svg>
         <span>RUN</span>
       </a>
-      <!-- <button id="runButton" onclick="show_whole_paths()">Run</button> -->
     </div>
-    <script src="./clock.js"></script>
     <!-- <<< for clock <<< -->
   </div>
 
@@ -101,6 +154,9 @@
   <script src="./d3.js" charset="utf-8"></script>
   <script src="//d3js.org/topojson.v1.min.js"></script>
   <script src="./search.js"></script>
+  <script src="./menu.js"></script>
+  <script src="./clock.js"></script>
+  <script src="./tooltip.js"></script>
   <script>
     var w = window,
       d = document,
@@ -113,9 +169,12 @@
     var userSetTime = 30;
     var stationQueue = [];
     var ekiNameToEkiData = {};
-    var clicked_stations = [];
+    var clicked_stations = new Set();
     var goal_station_name_ID = [];
     var last_center_station = NaN;
+    var last_center_station_red_flag = 0;
+    var last_nearest_station = NaN;
+    var last_nearest_station_red_flag = 0;
 
     d3.select(window).on("resize", resizing);
 
@@ -184,7 +243,7 @@
         .duration(500)
         .ease(d3.easeLinear)
         .attr("opacity", 1);
-      clicked_stations = [];
+      clicked_stations.clear();
       last_center_station = NaN;
     }
 
@@ -348,18 +407,20 @@
           .attr("repeatCount", "indefinite");
 
         console.log(d);
-        clicked_stations.push(d.GroupID);
+        clicked_stations.add(d.GroupID);
         console.log(clicked_stations);
       });
+      //circle.on("mouseover", showStaionTooltip)
+      //          .on("mouseout", hideStationTooltip);
     }
 
     //runされた時呼び出される関数
     function show_whole_paths() {
-      if (clicked_stations.length == 0) {
+      if (clicked_stations.size == 0) {
         // 何も選択せずにrunされた時
         console.log("no stations selected!");
         return;
-      } else if (clicked_stations.length == 1) {
+      } else if (clicked_stations.size == 1) {
         //一回の時
         console.log("selected one station");
         d3.selectAll("line")
@@ -367,9 +428,9 @@
           .duration(500)
           .ease(d3.easeLinear)
           .attr("opacity", 0);
-        show_within_stations(clicked_stations[0]);
-        // clicked_stations = [];
-        //stationQueue = [];
+        for (var value of clicked_stations) {
+          show_within_stations(value);
+        }
       } else {
         console.log("selected more than one station");
         d3.selectAll("line")
@@ -378,8 +439,6 @@
           .ease(d3.easeLinear)
           .attr("opacity", 0);
         show_center_station();
-        // clicked_stations = [];
-        //stationQueue = [];
       }
     }
 
@@ -412,16 +471,39 @@
               .attr("opacity", 1);
           }
           if (goal_station_name_ID.length > 0) {
+            // center_stationは駅名+グループID
+            console.log(goal_station_name_ID);
             var center_station = goal_station_name_ID.shift();
 
             if (last_center_station != NaN) {
-              g.select("#" + last_center_station)
-                .transition()
-                .duration(500)
-                .ease(d3.easeLinear)
-                .attr("fill-opacity", 0.2)
-                .attr("fill", "white");
+              if (last_center_station_red_flag == 1) {
+                g.select("#" + last_center_station)
+                  .attr("fill-opacity", 1)
+                  .attr("fill", "red");
+              } else {
+                g.select("#" + last_center_station)
+                  .transition()
+                  .duration(500)
+                  .ease(d3.easeLinear)
+                  .attr("fill-opacity", 0.2)
+                  .attr("fill", "white");
+              }
               g.select(".wave_in").remove();
+            }
+            console.log(g.select("#" + center_station).attr("fill"));
+            console.log(last_nearest_station_red_flag);
+            if (
+              g.select("#" + center_station).attr("fill") == "rgb(255, 0, 0)" ||
+              g.select("#" + center_station).attr("fill") == "red" ||
+              (g.select("#" + center_station).attr("fill") ==
+                "rgb(148, 0, 211)" &&
+                last_nearest_station_red_flag == 1)
+            ) {
+              console.log("conter_station_red !!");
+              last_center_station_red_flag = 1;
+            } else {
+              console.log("conter_station_not_red !!");
+              last_center_station_red_flag = 0;
             }
             g.select("#" + center_station)
               .transition()
@@ -438,6 +520,7 @@
             var kakudairitu =
               0.2 / d3.select("#" + center_station).attr("stroke-width");
             g.selectAll(".wave_out_animation").attr("to", 8);
+
             var wave = g
               .append("circle")
               .attr("stroke", "white")
@@ -458,6 +541,64 @@
               .attr("from", "25")
               .attr("to", "0")
               .attr("repeatCount", "indefinite");
+
+            if (last_nearest_station != NaN) {
+              if (last_nearest_station_red_flag == 1) {
+                g.select("#" + last_nearest_station)
+                  .attr("fill-opacity", 1)
+                  .attr("fill", "red");
+              } else {
+                g.select("#" + last_nearest_station)
+                  .transition()
+                  .duration(500)
+                  .ease(d3.easeLinear)
+                  .attr("fill-opacity", 0.2)
+                  .attr("fill", "white");
+              }
+            }
+
+            //ハブ駅の表示
+            if (goal_station_name_ID.length > 0) {
+              var nearest_hub_station = goal_station_name_ID.shift();
+              // if (last_nearest_station != NaN) {
+              //   console.log(last_nearest_station_red_flag);
+              //   if (last_nearest_station_red_flag == 1) {
+              //     g.select("#" + last_nearest_station)
+              //       .attr("fill-opacity", 1)
+              //       .attr("fill", "red");
+              //   } else {
+              //     g.select("#" + last_nearest_station)
+              //       .transition()
+              //       .duration(500)
+              //       .ease(d3.easeLinear)
+              //       .attr("fill-opacity", 0.2)
+              //       .attr("fill", "white");
+              //   }
+              //   // g.select(".wave_in").remove();
+              // }
+              console.log(g.select("#" + nearest_hub_station).attr("fill"));
+              if (
+                g.select("#" + nearest_hub_station).attr("fill") ==
+                  "rgb(255, 0, 0)" ||
+                g.select("#" + nearest_hub_station).attr("fill") == "red" ||
+                (g.select("#" + center_station).attr("fill") ==
+                  "rgb(0, 255, 0)" &&
+                  last_center_station_red_flag == 1)
+              ) {
+                console.log("hub_station_red !!");
+                last_nearest_station_red_flag = 1;
+              } else {
+                console.log("hub_station_not_red !!");
+                last_nearest_station_red_flag = 0;
+              }
+              g.select("#" + nearest_hub_station)
+                .transition()
+                .duration(500)
+                .ease(d3.easeLinear)
+                .attr("fill-opacity", 1)
+                .attr("fill", "darkviolet");
+              last_nearest_station = nearest_hub_station;
+            }
           }
         }
       );
@@ -522,9 +663,6 @@
     function clearForm() {
       console.log(document.getElementById("inputEkiname").composing);
       if (isAleradySearched) {
-        // document.getElementById("inputEkiname").value = document
-        //   .getElementById("inputEkiname")
-        //   .value.slice(-1);
         document.getElementById("inputEkiname").value = "";
         isAleradySearched = false;
       }
