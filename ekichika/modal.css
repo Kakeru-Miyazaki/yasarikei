@@ -6,8 +6,9 @@
 #open,
 .close {
   cursor: pointer;
-  width: 130px;
-  border: 1px solid #ccc;
+  width: 50px;
+  /* border: 1px solid #ccc; */
+  border: transparent;
   border-radius: 4px;
   text-align: center;
   padding: 12px;
@@ -16,6 +17,20 @@
   color: white;
   position: relative;
   /* top: 30%; */
+}
+
+#open {
+  position: absolute;
+  top: 850px;
+  right: 60px;
+  /* top: -100px; */
+  float: right;
+  /* padding-right: 100px; */
+}
+
+.close {
+  border: 1px solid#fff;
+  width: 80px;
 }
 
 #mask {

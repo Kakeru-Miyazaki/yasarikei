@@ -536,7 +536,7 @@ async function meet_up_within_T_min(startGroupID_set, T, stationQueue, goalStati
                     numOfVisitors[currentGroupID] += parseInt(1);
                     if (numOfVisitors[currentGroupID] == N){
                         //全員集合してたら
-                        console.log("集合場所", groupInfo[currentGroupID]);
+                        //console.log("集合場所", groupInfo[currentGroupID]);
                         traceBack(currentGroupID);
                     }
                 }
