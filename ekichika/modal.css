@@ -21,7 +21,9 @@
 
 #open {
   position: absolute;
-  top: 850px;
+  /* TODO set below */
+  /* top: 250px; */
+  bottom: 25px;
   right: 60px;
   /* top: -100px; */
   float: right;

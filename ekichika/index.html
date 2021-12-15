@@ -31,6 +31,9 @@
   .wave {
     pointer-events: none;
   }
+  .text{
+    pointer-events: none;
+  }
 </style>
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -46,6 +49,7 @@
 <link rel="stylesheet" href="menu.css" />
 <link rel="stylesheet" href="search.css" />
 <link rel="stylesheet" href="modal.css" />
+<link rel="stylesheet" href="ekilist.css" />
 <body bgcolor="black">
   <!-- >>> for sidebar >>> -->
   <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu" checked />
@@ -156,10 +160,12 @@
       </a>
     </div>
     <!-- <<< for clock <<< -->
-
-
-
+    <!-- <br> -->
+    <div id="selectedEkilist">
+    </div>
   </div>
+
+
 
   <div id="mask" class="hidden"></div>
   <section id="modal1" class="hidden modal">
@@ -218,6 +224,7 @@
   <script src="./clock.js"></script>
   <script src="./tooltip.js"></script>
   <script src="./menu.js"></script>
+  <script src="./ekilist.js"></script>
   <script>
     var w = window,
       d = document,
@@ -326,6 +333,7 @@
       clicked_stations.clear();
       clicked_stations_names.clear();
       last_center_station = NaN;
+      insertAllSelectedEkilist();
     }
 
     showMap().then(() => {
@@ -543,6 +551,7 @@
           console.log(clicked_stations);
           console.log(clicked_stations_names);
         }
+        insertAllSelectedEkilist();
       });
       circle.on("mouseover", showStationTooltip)
                 .on("mouseout", hideStationTooltip);
