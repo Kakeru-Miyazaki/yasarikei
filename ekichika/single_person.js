@@ -4,12 +4,12 @@ function single_person() {
     return;
   } else if (clicked_stations.size == 1){
     console.log("1 person mode");
-    d3.selectAll("line")
+    g.selectAll("line")
       .transition()
       .duration(500)
       .ease(d3.easeLinear)
       .attr("opacity", 0);
-    for (var value of clicked_stations) {
+    for (var value of clicked_stations) { //実際は一つ取り出しているだけ
       show_within_stations(value);
     }
   }

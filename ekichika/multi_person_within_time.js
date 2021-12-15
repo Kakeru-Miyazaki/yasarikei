@@ -20,7 +20,7 @@ function show_multi_station() {
     stationQueue,
     goal_station_name_ID
   ).then(() => {
-    g.selectAll("circle")
+    g.selectAll(".circle")
       .transition()
       .duration(500)
       .ease(d3.easeLinear)
@@ -40,8 +40,8 @@ function show_multi_station() {
         .transition()
         .duration(500)
         .ease(d3.easeLinear)
-        .attr("fill-opacity", 1)
-        .attr("fill", "green");
+        .attr("fill-opacity", 0.5)
+        .attr("fill", "royalblue");
     }
     for (var clicked_station_id of clicked_stations_names) {
       g.selectAll("#" + clicked_station_id)

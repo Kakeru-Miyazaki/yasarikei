@@ -107,7 +107,7 @@
           />
           <div class="radio-tile">
             <div class="icon meet-icon">
-              <img src="./fig/meet_.png" width="50" height="23" />
+              <img src="./fig/meet_.png" width="50" height="22" />
             </div>
           </div>
         </div>
@@ -123,7 +123,7 @@
           />
           <div class="radio-tile">
             <div class="icon car-icon">
-              <img src="./fig/meetWithTime_.png" width="45" height="36" />
+              <img src="./fig/meetWithTime_.png" width="45" height="35" />
             </div>
           </div>
         </div>
@@ -176,30 +176,29 @@
   <section id="modal2" class="hidden modal">
     <p>
       <strong>使い方</strong><br />
-      1. 集合したい人の最寄り駅をクリックする．<br />
+      1. 集合する複数人の最寄り駅をクリックする．<br />
       2. RUNボタンを押す．<br />
       <br />
-      選択された各駅から集まるのに適した駅が表示されます．<br />
-      このとき，<br><strong
+      最も早く集合できる駅が<strong
         ><span class="textGreen">黄緑色</div>
       </strong>
-        で表示されるのが最も早く集合できる駅で，
+        で表示され，<br />集まりやすい大きな駅が
         <strong>
         <span class="textPuple">紫色</div>
         </strong
       >
-        で表示されるのが全員が集まりやすい大きな駅となっています．
+        で表示されます．
     </p>
     <div id="close2" class="close">Close</div>
   </section>
   <section id="modal3" class="hidden modal">
     <p>
       <strong>使い方</strong><br />
-      1. 集合したい人の最寄り駅をクリックする．<br />
+      1. それぞれの最寄駅をクリックする．<br />
       2. マウスを使って時計をセッティングする．<br />
       3. RUNボタンを押す．<br />
       <br />
-      選ばれた駅からスタートした各人が設定された時間以下の移動で合流可能となる駅が表示されます．<br />
+      設定した時間以内に全員が行ける全ての駅が表示されます．<br />
     </p>
     </p>
     <div id="close3" class="close">Close</div>
@@ -227,10 +226,6 @@
     var clicked_stations = new Set();
     var clicked_stations_names = new Set();
     var goal_station_name_ID = [];
-    var last_center_station = NaN;
-    var last_center_station_red_flag = 0;
-    var last_nearest_station = NaN;
-    var last_nearest_station_red_flag = 0;
 
     var mode = "one";
 
@@ -239,7 +234,7 @@
     var projection = d3
       .geoMercator()
       .scale(60000)
-      .center([139.463191, 35.710335])
+      .center([139.38, 35.710335]) //[139.463191, 35.710335]
       .translate([width / 2, height / 2]);
 
     var path = d3.geoPath().projection(projection);
@@ -272,6 +267,24 @@
           "stroke-width",
           1.5 / Math.cbrt(event.transform.k)
         );
+        //テキスト
+        if (event.transform.k > 10) {
+          g.selectAll("text")
+            .attr("transform", event.transform)
+            .attr("font-size", function (d) {
+              return (
+                (0.6 * Math.sqrt(d.noriire)) / Math.cbrt(event.transform.k)
+              );
+            })
+            .attr("dy", function (d) {
+              return (
+                (0.2 * Math.sqrt(d.noriire)) / Math.cbrt(event.transform.k)
+              );
+            })
+            .attr("opacity", (event.transform.k - 9) / 15);
+        } else {
+          g.selectAll("text").attr("opacity", 0);
+        }
       });
 
     var svg = d3
@@ -522,8 +535,37 @@
           console.log(clicked_stations_names);
         }
       });
-      //circle.on("mouseover", showStaionTooltip)
-      //          .on("mouseout", hideStationTooltip);
+
+      var text = g
+        .selectAll("text")
+        .data(data)
+        .enter()
+        .append("text")
+        .attr("class", "text")
+        .attr("fill", "black")
+        .attr("text-anchor", "middle")
+        .attr("stroke", "none")
+        .attr("opacity", 0)
+        // .style("font-family","Ubuntu")
+        .call(textPosition);
+
+      function textPosition(p) {
+        p.attr("x", function (d) {
+          return projection([d.ido, d.keido])[0];
+        });
+        p.attr("y", function (d) {
+          return projection([d.ido, d.keido])[1];
+        });
+        p.text(function (d) {
+          return d.name;
+        });
+        p.attr("font-size", function (d) {
+          return 0.6 * Math.sqrt(d.noriire);
+        });
+        p.attr("dy", function (d) {
+          return 0.2 * Math.sqrt(d.noriire);
+        });
+      }
     }
 
     function resizing() {
