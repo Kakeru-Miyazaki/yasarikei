@@ -36,6 +36,19 @@
   .text {
     pointer-events: none;
   }
+
+
+  #title{
+    color: #fff;
+    position: absolute;
+    /* right: 410px; */
+    /* top: 30px; */
+    /* left: 180px;
+    top: 15px; */
+    bottom: 40px;
+    right: 110px;
+    font-size: 25px;
+  }
 </style>
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -202,9 +215,11 @@
   <div class="search">
     <input type="text" placeholder="Station Name" id="inputEkiname" />
     <button onclick="ekiSearch()" id="search">
-      <img src="fig/search2.png" width="20px" height="20px" />
+      <img src="fig/search2.png" width="19px" height="19px" />
     </button>
   </div>
+  
+  <div id="title">EKICHIKA</div>
 
   <!-- <<< for sidebar <<< -->
   <script src="./d3.js" charset="utf-8"></script>
