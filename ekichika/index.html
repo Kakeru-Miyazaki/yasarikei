@@ -254,7 +254,7 @@
         g.selectAll(".circle")
           .attr("transform", event.transform)
           .attr("r", function (d) {
-            return (1.2 * Math.sqrt(d.noriire)) / Math.cbrt(event.transform.k);
+            return (1.35 * Math.sqrt(d.noriire)) / Math.cbrt(event.transform.k);
           })
           .attr("stroke-width", 0.4 / Math.cbrt(event.transform.k));
         //波
@@ -424,7 +424,7 @@
           return projection([d.ido, d.keido])[1];
         });
         p.attr("r", function (d) {
-          return 1.2 * Math.sqrt(d.noriire);
+          return 1.35 * Math.sqrt(d.noriire);
         });
         p.attr("stroke-width", 0.4);
         p.attr("id", function (d) {
@@ -670,36 +670,36 @@
         .ease(d3.easeSin, d3.easeSinInOut)
         .attr("r", function (d) {
           console.log(d);
-          return (1.2 * Math.sqrt(d.noriire) * 5) / kakudairitu / 2;
+          return (1.35 * Math.sqrt(d.noriire) * 5) / kakudairitu / 2;
         })
         .transition()
         .ease(d3.easeSin, d3.easeSinInOut)
         .attr("r", function (d) {
-          return (1.2 * Math.sqrt(d.noriire)) / kakudairitu / 2;
-        })
-        .transition()
-        .duration(500)
-        .ease(d3.easeSin, d3.easeSinInOut)
-        .attr("r", function (d) {
-          console.log(d);
-          return (1.2 * Math.sqrt(d.noriire) * 4) / kakudairitu / 2;
-        })
-        .transition()
-        .ease(d3.easeSin, d3.easeSinInOut)
-        .attr("r", function (d) {
-          return (1.2 * Math.sqrt(d.noriire)) / kakudairitu / 2;
+          return (1.35 * Math.sqrt(d.noriire)) / kakudairitu / 2;
         })
         .transition()
         .duration(500)
         .ease(d3.easeSin, d3.easeSinInOut)
         .attr("r", function (d) {
           console.log(d);
-          return (1.2 * Math.sqrt(d.noriire) * 3) / kakudairitu / 2;
+          return (1.35 * Math.sqrt(d.noriire) * 4) / kakudairitu / 2;
         })
         .transition()
         .ease(d3.easeSin, d3.easeSinInOut)
         .attr("r", function (d) {
-          return (1.2 * Math.sqrt(d.noriire)) / kakudairitu / 2;
+          return (1.35 * Math.sqrt(d.noriire)) / kakudairitu / 2;
+        })
+        .transition()
+        .duration(500)
+        .ease(d3.easeSin, d3.easeSinInOut)
+        .attr("r", function (d) {
+          console.log(d);
+          return (1.35 * Math.sqrt(d.noriire) * 3) / kakudairitu / 2;
+        })
+        .transition()
+        .ease(d3.easeSin, d3.easeSinInOut)
+        .attr("r", function (d) {
+          return (1.35 * Math.sqrt(d.noriire)) / kakudairitu / 2;
         });
     }
 
@@ -752,7 +752,7 @@
 
 
   <div id="open">
-    <img src="fig/help.png" width="25px" height="25px" />
+    <img src="fig/help.png" width="40px" height="40px" />
   </div>
 
   <script src="./single_person.js"></script>
