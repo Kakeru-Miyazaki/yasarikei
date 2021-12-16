@@ -50,6 +50,8 @@
 <link rel="stylesheet" href="modal.css" />
 <link rel="stylesheet" href="ekilist.css" />
 <link rel="stylesheet" href="goalStations.css" />
+<link rel="stylesheet" href="fukidashi.css" />
+<link rel="stylesheet" href="denkouKeijiban.css" />
 
 <body bgcolor="black">
   <!-- >>> for sidebar >>> -->
@@ -60,6 +62,7 @@
     <div class="spinner diagonal part-2"></div>
   </label>
   <div id="sidebarMenu">
+    <p class="ledText" id="ledText"><span id="keiziban" >駅を2つ以上選んでください</span></p>
     <!-- <div class="wrapper"> -->
     <!-- >>> for search >>> -->
 
@@ -83,37 +86,40 @@
     <!-- >>> for menu >>> -->
 
 
-    <div class="container">
+    <div class="container" id="container">
       <div class="radio-tile-group">
         <!-- <form name="formMenu"> -->
-        <div class="input-container">
-          <input id="one" class="radio-button" type="radio" name="radio" checked value="one"
+          <div class="input-container">
+            <input id="one" class="radio-button" type="radio" name="radio" checked value="one"
             onchange="onMenuChange()" />
-          <div class="radio-tile">
-            <div class="icon one-icon">
-              <img src="./fig/one_.png" width="30" height="30" />
+            <div class="radio-tile">
+              <div class="icon one-icon">
+                <img src="./fig/one_.png" width="30" height="30" />
+              </div>
             </div>
           </div>
-        </div>
-
-        <div class="input-container">
-          <input id="meet" class="radio-button" type="radio" name="radio" value="meet" onchange="onMenuChange()" />
-          <div class="radio-tile">
-            <div class="icon meet-icon">
-              <img src="./fig/meet_.png" width="50" height="22" />
+          <p class="fukidashi">ひとりでどこまでいけるかな</p>
+          
+          <div class="input-container">
+            <input id="meet" class="radio-button" type="radio" name="radio" value="meet" onchange="onMenuChange()" />
+            <div class="radio-tile">
+              <div class="icon meet-icon">
+                <img src="./fig/meet_.png" width="50" height="22" />
+              </div>
             </div>
           </div>
-        </div>
-
-        <div class="input-container">
-          <input id="meetWithTime" class="radio-button" type="radio" name="radio" value="meetWithTime"
+          <p class="fukidashi">どこに集合しようかな</p>
+          
+          <div class="input-container">
+            <input id="meetWithTime" class="radio-button" type="radio" name="radio" value="meetWithTime"
             onchange="onMenuChange()" />
-          <div class="radio-tile">
-            <div class="icon car-icon">
-              <img src="./fig/meetWithTime_.png" width="45" height="35" />
+            <div class="radio-tile">
+              <div class="icon car-icon">
+                <img src="./fig/meetWithTime_.png" width="45" height="35" />
+              </div>
             </div>
           </div>
-        </div>
+          <p class="fukidashi">みんなでどこまでいけるかな</p>
         <!-- </form> -->
       </div>
     </div>
@@ -141,7 +147,6 @@
       </a>
     </div>
     <!-- <<< for clock <<< -->
-    
     <!-- <br> -->
     <div id="selectedEkilist">
     </div>
@@ -223,6 +228,7 @@
     var ekiNameToEkiData = {};
     var clicked_stations = new Set();
     var clicked_stations_names = new Set();
+    var Greens = [];
     var goal_station_name_ID = [];
     var goal_station_time = [];
 
@@ -268,6 +274,7 @@
         );
         //tooltip
         resizeStationTooltip(event);
+        hideStationTooltipOnZoom(event);
         //テキスト
         if (event.transform.k > 6) {
           g.selectAll("text")
@@ -444,94 +451,128 @@
 
       circle.on("click", function (event, d) {
         if (mode == "one") {
-          g.selectAll("circle")
-            .transition()
-            .duration(500)
-            .ease(d3.easeLinear)
-            .attr("fill-opacity", 0.2)
-            .attr("fill", "white");
-          g.selectAll(".wave").remove();
-          d3.select(this)
-            .transition()
-            .duration(500)
-            .ease(d3.easeLinear)
-            .attr("fill-opacity", 1)
-            .attr("fill", "red");
-
-          var circle_cx = d3.select(this).attr("cx");
-          var circle_cy = d3.select(this).attr("cy");
-          var circle_transform = d3.select(this).attr("transform");
-          var kakudairitu = 0.2 / d3.select(this).attr("stroke-width");
-          // 選択した駅から波動を発生させる
-          var wave = g
-            .append("circle")
-            .attr("class", "wave wave_out")
-            .attr("stroke", "white")
-            .attr("stroke-width", 0.2)
-            .attr("opacity", 1)
-            .attr("fill-opacity", 0)
-            .attr("cx", circle_cx)
-            .attr("cy", circle_cy)
-            .attr("r", 0)
-            .attr("transform", circle_transform);
-
-          wave
-            .append("animate")
-            .attr("class", "wave_out_animation")
-            .attr("attributeName", "r")
-            .attr("begin", "0s")
-            .attr("dur", "1s")
-            .attr("from", "0")
-            .attr("to", "25")
-            .attr("repeatCount", "indefinite");
-
           console.log(d);
-          clicked_stations.clear(); //空にする
-          clicked_stations_names.clear();
-          clicked_stations.add(d.GroupID);
-          clicked_stations_names.add(d.name + d.GroupID);
-          console.log(clicked_stations);
-          console.log(clicked_stations_names);
+          if (clicked_stations_names.has(d.name + d.GroupID)){
+            clicked_stations.clear(); //空にする
+            clicked_stations_names.clear();
+            console.log(clicked_stations);
+            console.log(clicked_stations_names);
+            g.selectAll("circle")
+                .transition()
+                .duration(500)
+                .ease(d3.easeLinear)
+                .attr("fill-opacity", 0.2)
+                .attr("fill", "white");
+            g.selectAll(".wave").remove();
+          } else {
+            clicked_stations.clear(); //空にする
+            clicked_stations_names.clear();
+            clicked_stations.add(d.GroupID);
+            clicked_stations_names.add(d.name + d.GroupID);
+
+            console.log(clicked_stations);
+            console.log(clicked_stations_names);
+            g.selectAll("circle")
+                .transition()
+                .duration(500)
+                .ease(d3.easeLinear)
+                .attr("fill-opacity", 0.2)
+                .attr("fill", "white");
+            g.selectAll(".wave").remove();
+            d3.select(this)
+                .transition()
+                .duration(500)
+                .ease(d3.easeLinear)
+                .attr("fill-opacity", 1)
+                .attr("fill", "red");
+
+            var circle_cx = d3.select(this).attr("cx");
+            var circle_cy = d3.select(this).attr("cy");
+            var circle_transform = d3.select(this).attr("transform");
+            var kakudairitu = 0.2 / d3.select(this).attr("stroke-width");
+            // 選択した駅から波動を発生させる
+            var wave = g
+                .append("circle")
+                .attr("class", "wave wave_out")
+                .attr("stroke", "white")
+                .attr("stroke-width", 0.2)
+                .attr("opacity", 1)
+                .attr("fill-opacity", 0)
+                .attr("cx", circle_cx)
+                .attr("cy", circle_cy)
+                .attr("r", 0)
+                .attr("transform", circle_transform);
+
+            wave
+                .append("animate")
+                .attr("class", "wave_out_animation")
+                .attr("attributeName", "r")
+                .attr("begin", "0s")
+                .attr("dur", "1s")
+                .attr("from", "0")
+                .attr("to", "25")
+                .attr("repeatCount", "indefinite");
+          }
         } else {
-          d3.select(this)
-            .transition()
-            .duration(500)
-            .ease(d3.easeLinear)
-            .attr("fill-opacity", 1)
-            .attr("fill", "red");
-
-          var circle_cx = d3.select(this).attr("cx");
-          var circle_cy = d3.select(this).attr("cy");
-          var circle_transform = d3.select(this).attr("transform");
-          var kakudairitu = 0.2 / d3.select(this).attr("stroke-width");
-          // 選択した駅から波動を発生させる
-          var wave = g
-            .append("circle")
-            .attr("class", "wave wave_out")
-            .attr("stroke", "white")
-            .attr("stroke-width", 0.2)
-            .attr("opacity", 1)
-            .attr("fill-opacity", 0)
-            .attr("cx", circle_cx)
-            .attr("cy", circle_cy)
-            .attr("r", 0)
-            .attr("transform", circle_transform);
-
-          wave
-            .append("animate")
-            .attr("class", "wave_out_animation")
-            .attr("attributeName", "r")
-            .attr("begin", "0s")
-            .attr("dur", "1s")
-            .attr("from", "0")
-            .attr("to", "25")
-            .attr("repeatCount", "indefinite");
-
           console.log(d);
-          clicked_stations.add(d.GroupID);
-          clicked_stations_names.add(d.name + d.GroupID);
-          console.log(clicked_stations);
-          console.log(clicked_stations_names);
+        //   clicked_stations.add(d.GroupID);
+          if (clicked_stations_names.has(d.name + d.GroupID)){
+            clicked_stations_names.delete(d.name + d.GroupID)
+            console.log(clicked_stations_names);
+            if (Greens.length > 0 && Greens[0] == d.name + d.GroupID){
+                d3.select(this)
+                    .transition()
+                    .duration(500)
+                    .ease(d3.easeLinear)
+                    .attr("fill-opacity", 1)
+                    .attr("fill", "lime");
+            } else {
+                d3.select(this)
+                    .transition()
+                    .duration(500)
+                    .ease(d3.easeLinear)
+                    .attr("fill-opacity", 0.2)
+                    .attr("fill", "white");
+            }
+            g.select(".wave_" + d.name).remove();
+          } else {
+            clicked_stations_names.add(d.name + d.GroupID);
+            // console.log(clicked_stations);
+            console.log(clicked_stations_names);
+            d3.select(this)
+                .transition()
+                .duration(500)
+                .ease(d3.easeLinear)
+                .attr("fill-opacity", 1)
+                .attr("fill", "red");
+
+            var circle_cx = d3.select(this).attr("cx");
+            var circle_cy = d3.select(this).attr("cy");
+            var circle_transform = d3.select(this).attr("transform");
+            var kakudairitu = 0.2 / d3.select(this).attr("stroke-width");
+            // 選択した駅から波動を発生させる
+            var wave = g
+                .append("circle")
+                .attr("class", "wave wave_out wave_" + d.name)
+                .attr("stroke", "white")
+                .attr("stroke-width", 0.2)
+                .attr("opacity", 1)
+                .attr("fill-opacity", 0)
+                .attr("cx", circle_cx)
+                .attr("cy", circle_cy)
+                .attr("r", 0)
+                .attr("transform", circle_transform);
+
+            wave
+                .append("animate")
+                .attr("class", "wave_out_animation")
+                .attr("attributeName", "r")
+                .attr("begin", "0s")
+                .attr("dur", "1s")
+                .attr("from", "0")
+                .attr("to", "25")
+                .attr("repeatCount", "indefinite");
+          }
         }
         insertAllSelectedEkilist();
       });
@@ -681,12 +722,29 @@
         clearForm();
       }
     });
+    
+    document.getElementById("inputEkiname").addEventListener("keydown", (e) => {
+      if (e.keyCode == 13) {
+        ekiSearch();
+      }
+      if (e.keyCode == 229) {
+        clearForm();
+      }
+    });
+
+    document.getElementById('container').addEventListener('mouseover', function(){
+      document.getElementById("ledText").style.display = "none";
+});
+    BODY.addEventListener('click', function(){
+      document.getElementById("ledText").style.display = "none";
+});
+    
   </script>
 
 
 
   <div id="open">
-    <img src="fig/help.png" width="40px" height="40px" />
+    <img src="fig/help.png" width="25px" height="25px" />
   </div>
 
   <script src="./single_person.js"></script>

@@ -1,5 +1,11 @@
 function multi_person() {
+  for (var single_station of clicked_stations_names) {
+    single_station = single_station.replace(/[0-9]/gi, '');
+    clicked_stations.add(ekiNameToEkiData[single_station].GroupID);
+  }
   if (clicked_stations.size < 2) {
+    document.getElementById("keiziban").innerHTML = "駅を2つ以上選んでください";
+    document.getElementById("ledText").style.display = "block";
     console.log("num of stations selected is not enough!");
     return;
   } else {
@@ -11,6 +17,7 @@ function multi_person() {
       .attr("opacity", 0);
     show_center_station();
   }
+  clicked_stations.clear();
 }
 
 clicked_stations_names;
@@ -52,6 +59,8 @@ function show_center_station() {
           .ease(d3.easeLinear)
           .attr("fill-opacity", 1)
           .attr("fill", "lime");
+        Greens = [];
+        Greens.push(center_station);
         show_waves(center_station);
       } else if (goal_station_name_ID.length == 2) {
         document.getElementById("goalGreen").style.display = "block";
@@ -75,6 +84,8 @@ function show_center_station() {
           .ease(d3.easeLinear)
           .attr("fill-opacity", 1)
           .attr("fill", "lime");
+        Greens = [];
+        Greens.push(center_station);
         g.select("#" + nearest_hub_station)
           .transition()
           .duration(500)

@@ -3,6 +3,8 @@ var stationTooltip;
 var stationTooltipScale = 1;  //for tooltip
 var stationTooltipPreviousScale = 1;
 var stationTooltipFontSize = 10;
+var stationTooltipLowerScaleThreshold = 1.8;
+var stationTooltipHigherScaleThreshold = 10.5;
 
 //var stationTooltipBgWidth = 60;
 //var stationTooltipBgHeight = 20;
@@ -28,8 +30,10 @@ function tooltipHandlerOnCircle(event){
   if(event.type == "mouseover"){
     stationTooltipFlag[stationTooltipClass] = true;
     setTimeout(() => {
-      if(stationTooltipFlag[stationTooltipClass]){
-        showStationTooltip(event, data, stationTooltipClass ,cx, cy, transform);
+      if(stationTooltipFlag[stationTooltipClass] && stationTooltipScale > stationTooltipLowerScaleThreshold && stationTooltipScale < stationTooltipHigherScaleThreshold){
+        if(stationTooltips.select("." + stationTooltipClass).empty()){
+          showStationTooltip(event, data, stationTooltipClass ,cx, cy, transform);
+        }
       }
     }, 180);
   }
@@ -40,7 +44,7 @@ function tooltipHandlerOnCircle(event){
         hideStationTooltip(event, stationTooltipClass);
         delete stationTooltipFlag[stationTooltipClass];
       }
-    }, 20);
+    }, 5);
   }
 }
 
@@ -61,7 +65,8 @@ function showStationTooltip(event, data, stationTooltipClass, x, y, transform, y
   stationTooltip = stationTooltips
       .append("g")
       .attr("class", stationTooltipClass)
-      .call(zoom);
+      .on("mouseover", tooltipHandlerOnTooltip)
+      .on("mouseout", tooltipHandlerOnTooltip);
   //console.log(stationTooltipZoom);
   stationTooltip.selectAll(".stationTooltipText")
       .data(data)
@@ -75,8 +80,7 @@ function showStationTooltip(event, data, stationTooltipClass, x, y, transform, y
       .attr("y", y_col)
       .attr("dy", function(d, i){return - scaled_fontsize * (dataN - i - 1); })
       .attr("font-size", scaled_fontsize)
-      .text(function(d){return d; })
-      .call(zoom);
+      .text(function(d){return d; });
       //console.log(stationTooltip);
   
   stationTooltip
@@ -94,7 +98,6 @@ function showStationTooltip(event, data, stationTooltipClass, x, y, transform, y
       .attr("stroke-width", 0.1);
 }
 function hideStationTooltip(event, stationTooltipClass){
-  console
   svg.selectAll("." + stationTooltipClass).remove();
 }
 function resizeStationTooltip(event){
@@ -145,20 +148,26 @@ function resizeStationTooltip(event){
   }
   stationTooltipPreviousScale = stationTooltipScale;
 }
+function hideStationTooltipOnZoom(event){
+  if (event.transform.k < stationTooltipLowerScaleThreshold || event.transform.k > stationTooltipHigherScaleThreshold){
+    stationTooltips.selectAll("g").remove();
+  }
+}
 
 function tooltipHandlerOnTooltip(event){
   var selectedTooltip = d3.select(this);
-  var cx = selected_circle.attr("cx");
-  var cy = selected_circle.attr("cy");
-  var data = [selected_circle.datum().name];
-  var ID = data[0] + data[1];
-  var transform = selected_circle.attr("transform");
-
+  var stationTooltipClass = selectedTooltip.attr("class")
   if(event.type == "mouseover"){
-    showStationTooltip(event, data, ID ,cx, cy, transform);
+    stationTooltipFlag[stationTooltipClass] = true;
   }
   else if(event.type == "mouseout"){
-    hideStationTooltip(event, ID);
+    stationTooltipFlag[stationTooltipClass] = false;
+    setTimeout(() => {
+      if(stationTooltipFlag[stationTooltipClass] == false){
+        hideStationTooltip(event, stationTooltipClass);
+        delete stationTooltipFlag[stationTooltipClass];
+      }
+    }, 10);
   }
 }
 
