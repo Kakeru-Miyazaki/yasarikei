@@ -4,7 +4,6 @@
 function onMenuChange() {
   // var mode;
   reset_selections();
-
   let elems = document.getElementsByName("radio");
   // let val = "";
 
@@ -18,12 +17,14 @@ function onMenuChange() {
 
   if (mode == "one") {
     document.getElementById("clockAndTime").style.display = "block";
-    document.getElementById('keiziban').innerHTML = "スタートにしたい駅を選んでください";
+    document.getElementById("goalStations").style.display = "none";
   } else if (mode == "meet") {
     document.getElementById("clockAndTime").style.display = "none";
-    document.getElementById('keiziban').innerHTML = "駅を2つ以上選んでください";
+    document.getElementById("goalStations").style.display = "block";
+    document.getElementById("goalGreen").style.display = "none";
+    document.getElementById("goalPurple").style.display = "none";
   } else if (mode == "meetWithTime") {
     document.getElementById("clockAndTime").style.display = "block";
-    document.getElementById('keiziban').innerHTML = "駅を2つ以上選んでください";
+    document.getElementById("goalStations").style.display = "none";
   }
 }

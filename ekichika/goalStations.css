@@ -1,0 +1,41 @@
+#goalStations {
+  padding-top: 10px;
+  display: none;
+  /* text-align: center; */
+  color: white;
+  font-size: 20px;
+  /* line-height: 70px; */
+  margin-left: 80px;
+  margin-right: 80px;
+}
+
+#goalGreen {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+#goalPurple {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.border-radius {
+  width: 19px;
+  height: 19px;
+  /* line-height: 200px; */
+  border-radius: 50%;
+  /* color: #fff; */
+  /* text-align: center; */
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+.green {
+  background-color: lime;
+}
+.purple {
+  background-color: darkviolet;
+}

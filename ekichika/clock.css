@@ -3,7 +3,8 @@
 .wrapper {
   width: 100%;
   height: auto;
-  padding: 10px;
+  padding-top: 5px;
+  padding-bottom: 10px;
   box-sizing: border-box;
   /* background-color: black; */
   /* background-color: rgba(0, 0, 0, 0.5); */
