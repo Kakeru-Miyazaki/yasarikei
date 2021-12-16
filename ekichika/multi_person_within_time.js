@@ -33,6 +33,10 @@ function show_multi_station() {
       .ease(d3.easeLinear)
       .attr("fill-opacity", 0.2)
       .attr("fill", "white");
+    if (stationQueue.length == 0) {
+      document.getElementById("keiziban").innerHTML = "該当駅がありません...";
+      document.getElementById("ledText").style.display = "block";
+    }
     while (stationQueue.length) {
       var rinsetsu_stations = stationQueue.shift();
       g.select(".s" + rinsetsu_stations[0] + "_" + rinsetsu_stations[1])

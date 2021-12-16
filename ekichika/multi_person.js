@@ -92,6 +92,8 @@ function show_center_station() {
           .ease(d3.easeLinear)
           .attr("fill-opacity", 1)
           .attr("fill", "darkviolet");
+        Purples = [];
+        Purples.push(nearest_hub_station);
         show_waves(center_station);
         show_waves(nearest_hub_station);
       }

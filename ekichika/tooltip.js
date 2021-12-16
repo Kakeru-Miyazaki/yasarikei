@@ -44,7 +44,7 @@ function tooltipHandlerOnCircle(event){
         hideStationTooltip(event, stationTooltipClass);
         delete stationTooltipFlag[stationTooltipClass];
       }
-    }, 5);
+    }, 0);
   }
 }
 
@@ -171,7 +171,38 @@ function tooltipHandlerOnTooltip(event){
   }
 }
 
-function showStationFoldedTooltip(event, data, ID, x, y, transform, y_offset=-10, x_offset=0){
+//==================== Folded tooltip =============================//
+function foldedTooltipHandlerOnCircle(event){
+  var selected_circle = d3.select(this);
+  var cx = selected_circle.attr("cx");
+  var cy = selected_circle.attr("cy");
+  var data = [selected_circle.datum().name];
+  var ID = data[0] + data[1];
+  var transform = selected_circle.attr("transform");
+  var stationTooltipClass = "stationFoldedTooltip" + ID;
+
+  if(event.type == "mouseover"){
+    stationTooltipFlag[stationTooltipClass] = true;
+    setTimeout(() => {
+      if(stationTooltipFlag[stationTooltipClass] && stationTooltipScale > stationTooltipLowerScaleThreshold && stationTooltipScale < stationTooltipHigherScaleThreshold){
+        if(stationTooltips.select("." + stationTooltipClass).empty()){
+          showStationTooltip(event, data, stationTooltipClass ,cx, cy, transform);
+        }
+      }
+    }, 180);
+  }
+  else if(event.type == "mouseout"){
+    stationTooltipFlag[stationTooltipClass] = false;
+    setTimeout(() => {
+      if(stationTooltipFlag[stationTooltipClass] == false){
+        hideStationTooltip(event, stationTooltipClass);
+        delete stationTooltipFlag[stationTooltipClass];
+      }
+    }, 1);
+  }
+}
+
+function showStationFoldedTooltip(event, data, stationFoldedTooltipClass, x, y, transform, y_offset=-10, x_offset=0){
   var y_col = parseFloat(y) + y_offset / Math.cbrt(stationTooltipScale);
   var x_col = parseFloat(x) + x_offset / Math.cbrt(stationTooltipScale);
   var scaled_fontsize = stationTooltipFontSize / Math.cbrt(stationTooltipScale);
@@ -185,19 +216,17 @@ function showStationFoldedTooltip(event, data, ID, x, y, transform, y_offset=-10
   }
   stationTooltipBgWidth = scaled_fontsize * textMaxLength * 1.2;
 
-  //flagに登録
-  delFoldedFlag["stationFoldedTooltip" + ID] = false;
-
   stationTooltip = stationTooltips
       .append("g")
-      .attr("class", "stationFoldedTooltip" + ID)
-      .call(zoom);
+      .attr("class", stationFoldedTooltipClass)
+      .on("mouseover", tooltipHandlerOnTooltip)
+      .on("mouseout", tooltipHandlerOnTooltip);
   //console.log(stationTooltipZoom);
-  stationTooltip.selectAll(".stationFoldedTooltipText")
+  stationTooltip.selectAll(".stationTooltipText")
       .data(data)
       .enter()
       .append("text")
-      .attr("class", "stationFoldedTooltipText")
+      .attr("class", "stationTooltipText")
       .attr("fill", "white")
       .attr("stroke", "none")
       .attr("text-anchor", "middle")
@@ -205,13 +234,12 @@ function showStationFoldedTooltip(event, data, ID, x, y, transform, y_offset=-10
       .attr("y", y_col)
       .attr("dy", function(d, i){return - scaled_fontsize * (dataN - i - 1); })
       .attr("font-size", scaled_fontsize)
-      .text(function(d){return d; })
-      .call(zoom);
+      .text(function(d){return d; });
       //console.log(stationTooltip);
   
   stationTooltip
       .append("rect")
-      .attr("class", "stationFoldedTooltipBg")
+      .attr("class", "stationTooltipBg")
       .attr("width", stationTooltipBgWidth)
       .attr("height", scaled_fontsize * dataN * 1.2)
       .attr("x", x_col - stationTooltipBgWidth / 2.0)
@@ -223,8 +251,8 @@ function showStationFoldedTooltip(event, data, ID, x, y, transform, y_offset=-10
       .attr("stroke", "white")
       .attr("stroke-width", 0.1);
 }
-function hideStationFoldedTooltip(event, ID){
-  svg.selectAll(".stationTooltip" + ID).remove();
+function hideStationFoldedTooltip(event, stationFoldedTooltipClass){
+  svg.selectAll("." + stationFoldedTooltipClass).remove();
 }
 function resizeStationFoldedTooltip(event){
   stationTooltipScale = event.transform.k;
@@ -274,6 +302,27 @@ function resizeStationFoldedTooltip(event){
   }
   stationTooltipPreviousScale = stationTooltipScale;
 }
-function stationFoldedTooltipChColor(event, tooltipClass){
-
+function hideStationFoldedTooltipOnZoom(event){
+  if (event.transform.k < stationTooltipLowerScaleThreshold || event.transform.k > stationTooltipHigherScaleThreshold){
+    stationTooltips.selectAll("g").remove();
+  }
+}
+function foldedTooltipHandlerOnFoldedTooltip(event){
+  var selectedTooltip = d3.select(this);
+  var stationTooltipClass = selectedTooltip.attr("class")
+  if(event.type == "mouseover"){
+    stationTooltipFlag[stationTooltipClass] = true;
+  }
+  else if(event.type == "mouseout"){
+    stationTooltipFlag[stationTooltipClass] = false;
+    setTimeout(() => {
+      if(stationTooltipFlag[stationTooltipClass] == false){
+        hideStationTooltip(event, stationTooltipClass);
+        delete stationTooltipFlag[stationTooltipClass];
+      }
+    }, 10);
+  }
+}
+function ChFoldedTooltipColor(event, stationFoldedTooltipClass){
+  svg.selectAll("." + stationFoldedTooltipClass).attr()
 }

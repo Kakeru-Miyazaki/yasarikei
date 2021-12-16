@@ -193,7 +193,7 @@
       2. マウスを使って時計をセッティングする．<br />
       3. RUNボタンを押す．<br />
       <br />
-      設定した時間以内に全員が行ける全ての駅が表示されます．<br />
+      設定した時間以内に全員が行ける駅が<span class="textLightBlue"><strong>薄青色</strong></span>で表示されます．<br />
     </p>
     </p>
     <div id="close3" class="close">Close</div>
@@ -229,6 +229,7 @@
     var clicked_stations = new Set();
     var clicked_stations_names = new Set();
     var Greens = [];
+    var Purples = [];
     var goal_station_name_ID = [];
     var goal_station_time = [];
 
@@ -526,6 +527,13 @@
                     .ease(d3.easeLinear)
                     .attr("fill-opacity", 1)
                     .attr("fill", "lime");
+            } else if (Purples.length > 0 && Purples[0] == d.name + d.GroupID){
+                d3.select(this)
+                    .transition()
+                    .duration(500)
+                    .ease(d3.easeLinear)
+                    .attr("fill-opacity", 1)
+                    .attr("fill", "darkviolet");
             } else {
                 d3.select(this)
                     .transition()
