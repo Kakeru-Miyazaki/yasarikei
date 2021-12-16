@@ -28,19 +28,17 @@
     stroke-linecap: round;
     pointer-events: none;
   }
-
   .wave {
-    pointer-events: none;
-  }
-
-  .text {
     pointer-events: none;
   }
 </style>
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Lora&family=Ubuntu:wght@300&display=swap" rel="stylesheet" />
+<link
+  href="https://fonts.googleapis.com/css2?family=Lora&family=Ubuntu:wght@300&display=swap"
+  rel="stylesheet"
+/>
 <link rel="stylesheet" href="sidebar.css" />
 <link rel="stylesheet" href="button.css" />
 <link rel="stylesheet" href="form.css" />
@@ -49,7 +47,7 @@
 <link rel="stylesheet" href="search.css" />
 <link rel="stylesheet" href="modal.css" />
 <link rel="stylesheet" href="ekilist.css" />
-
+<link rel="stylesheet" href="denkouKeijiban.css" />
 <body bgcolor="black">
   <!-- >>> for sidebar >>> -->
   <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu" checked />
@@ -59,6 +57,8 @@
     <div class="spinner diagonal part-2"></div>
   </label>
   <div id="sidebarMenu">
+
+    <p class="ledText"><span id="keiziban" >スタートにしたい駅を選んでください</span></p>
     <!-- <div class="wrapper"> -->
     <!-- >>> for search >>> -->
 
@@ -86,8 +86,15 @@
       <div class="radio-tile-group">
         <!-- <form name="formMenu"> -->
         <div class="input-container">
-          <input id="one" class="radio-button" type="radio" name="radio" checked value="one"
-            onchange="onMenuChange()" />
+          <input
+            id="one"
+            class="radio-button"
+            type="radio"
+            name="radio"
+            checked
+            value="one"
+            onchange="onMenuChange()"
+          />
           <div class="radio-tile">
             <div class="icon one-icon">
               <img src="./fig/one_.png" width="30" height="30" />
@@ -96,7 +103,14 @@
         </div>
 
         <div class="input-container">
-          <input id="meet" class="radio-button" type="radio" name="radio" value="meet" onchange="onMenuChange()" />
+          <input
+            id="meet"
+            class="radio-button"
+            type="radio"
+            name="radio"
+            value="meet"
+            onchange="onMenuChange()"
+          />
           <div class="radio-tile">
             <div class="icon meet-icon">
               <img src="./fig/meet_.png" width="50" height="22" />
@@ -105,8 +119,14 @@
         </div>
 
         <div class="input-container">
-          <input id="meetWithTime" class="radio-button" type="radio" name="radio" value="meetWithTime"
-            onchange="onMenuChange()" />
+          <input
+            id="meetWithTime"
+            class="radio-button"
+            type="radio"
+            name="radio"
+            value="meetWithTime"
+            onchange="onMenuChange()"
+          />
           <div class="radio-tile">
             <div class="icon car-icon">
               <img src="./fig/meetWithTime_.png" width="45" height="35" />
@@ -120,8 +140,8 @@
 
     <!-- >>> for clock >>> -->
     <div class="wrapper">
-
-
+      
+      
       <div id="clockAndTime">
         <div class="clock" id="clock" draggable="true">
           <div class="scale" id="scale"></div>
@@ -165,13 +185,15 @@
       1. 集合する複数人の最寄り駅をクリックする．<br />
       2. RUNボタンを押す．<br />
       <br />
-      最も早く集合できる駅が<strong><span class="textGreen">黄緑色</div>
+      最も早く集合できる駅が<strong
+        ><span class="textGreen">黄緑色</div>
       </strong>
-      で表示され，<br />集まりやすい大きな駅が
-      <strong>
+        で表示され，<br />集まりやすい大きな駅が
+        <strong>
         <span class="textPuple">紫色</div>
-      </strong>
-      で表示されます．
+        </strong
+      >
+        で表示されます．
     </p>
     <div id="close2" class="close">Close</div>
   </section>
@@ -532,7 +554,7 @@
         insertAllSelectedEkilist();
       });
       circle.on("mouseover", showStationTooltip)
-        .on("mouseout", hideStationTooltip);
+                .on("mouseout", hideStationTooltip);
 
       var text = g
         .selectAll("text")
@@ -587,8 +609,8 @@
     function ekiSearch() {
       isAleradySearched = true;
       var inputName = document.getElementById("inputEkiname").value;
-      if (inputName.slice(-1) == "駅") {
-        inputName = inputName.slice(0, -1);
+      if (inputName.slice(-1) == "駅"){
+        inputName = inputName.slice(0,-1);
       }
       console.log(inputName);
       if (ekiNameToEkiData[inputName] == undefined) {
@@ -617,31 +639,7 @@
         .ease(d3.easeSin, d3.easeSinInOut)
         .attr("r", function (d) {
           console.log(d);
-          return (1.2 * Math.sqrt(d.noriire) * 5) / kakudairitu ** 3 / 2;
-        })
-        .transition()
-        .ease(d3.easeSin, d3.easeSinInOut)
-        .attr("r", function (d) {
-          return (1.2 * Math.sqrt(d.noriire)) / kakudairitu / 2;
-        })
-        .transition()
-        .duration(1000)
-        .ease(d3.easeSin, d3.easeSinInOut)
-        .attr("r", function (d) {
-          console.log(d);
-          return (1.2 * Math.sqrt(d.noriire) * 5) / kakudairitu ** 3 / 2;
-        })
-        .transition()
-        .ease(d3.easeSin, d3.easeSinInOut)
-        .attr("r", function (d) {
-          return (1.2 * Math.sqrt(d.noriire)) / kakudairitu / 2;
-        })
-        .transition()
-        .duration(1000)
-        .ease(d3.easeSin, d3.easeSinInOut)
-        .attr("r", function (d) {
-          console.log(d);
-          return (1.2 * Math.sqrt(d.noriire) * 5) / kakudairitu ** 3 / 2;
+          return (1.2 * Math.sqrt(d.noriire) * 20) / kakudairitu ** 3 / 2;
         })
         .transition()
         .ease(d3.easeSin, d3.easeSinInOut)

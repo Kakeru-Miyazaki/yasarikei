@@ -132,6 +132,7 @@ clock.onmousedown = function (event) {
   clock.onmouseup = function () {
     isDragged = false;
     // clock.onmouseup = null;
+    insertAllSelectedEkilist();
   };
 };
 
