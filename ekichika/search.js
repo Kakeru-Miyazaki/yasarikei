@@ -190,7 +190,7 @@ async function meet_up(startGroupID_set, T, stationQueue, goalStationNameID, goa
     var ARAKAWASEN = 0.8;
     var changeTrains_time = 5;
     var stopTime = 0.75;
-    var hubStationThreshold = 6;
+    var hubStationThreshold = 3;
     
     //実際の処理
    await Make_Adj_List_meetup();
@@ -309,8 +309,8 @@ async function meet_up(startGroupID_set, T, stationQueue, goalStationNameID, goa
                     visited_group_flag[i][currentGroupID] = true;
                     numOfVisitors[currentGroupID] += parseInt(1);
                     if (numOfVisitors[currentGroupID] == N){
-                        var noriire = Adj_list[currentStationID].length;
-
+                        //var noriire = Adj_list[currentStationID].length;
+                        var noriire = groupInfo[currentGroupID].length
                         if(meetupFlag.nearest == false){
                             meetupFlag.nearest = true;
                             if(noriire >= hubStationThreshold){
