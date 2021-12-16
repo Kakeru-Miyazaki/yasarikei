@@ -6,11 +6,11 @@ body {
   background-color: black;
 }
 .container {
-  display: flex;
+  /* display: flex; */
   justify-content: center;
   align-items: center;
   /* height: auto; */
-  padding-top: 20px;
+  /* padding-top: 20px; */
   padding-bottom: 15px;
 }
 .radio-tile-group {
