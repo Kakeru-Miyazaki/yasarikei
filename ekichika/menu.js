@@ -23,6 +23,7 @@ function onMenuChange() {
     document.getElementById("goalStations").style.display = "block";
     document.getElementById("goalGreen").style.display = "none";
     document.getElementById("goalPurple").style.display = "none";
+    document.getElementById("goalOne").style.display = "none";
   } else if (mode == "meetWithTime") {
     document.getElementById("clockAndTime").style.display = "block";
     document.getElementById("goalStations").style.display = "none";

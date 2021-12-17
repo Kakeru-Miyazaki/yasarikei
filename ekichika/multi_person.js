@@ -42,16 +42,17 @@ function show_center_station() {
       }
       if (goal_station_name_ID.length == 1) {
 
-        document.getElementById("goalGreen").style.display = "block";
+        document.getElementById("goalOne").style.display = "block";
+        document.getElementById("goalGreen").style.display = "none";
         document.getElementById("goalPurple").style.display = "none";
         // center_stationは駅名+グループID
         var center_station = goal_station_name_ID.shift();
-        document.getElementById("goalGreenName").innerHTML = center_station.replace(/[0-9]/gi, '');
+        document.getElementById("goalOneName").innerHTML = center_station.replace(/[0-9]/gi, '');
 
         // 最短駅までの時間
         var center_station_time = goal_station_time.shift();
         console.log("center_station_time:" + center_station_time);
-        document.getElementById("goalGreenTime").innerHTML = getDisplayTime(center_station_time);//Math.ceil(center_station_time) + "min";
+        document.getElementById("goalOneTime").innerHTML = getDisplayTime(center_station_time);//Math.ceil(center_station_time) + "min";
 
         g.select("#" + center_station)
           .transition()
@@ -65,6 +66,7 @@ function show_center_station() {
       } else if (goal_station_name_ID.length == 2) {
         document.getElementById("goalGreen").style.display = "block";
         document.getElementById("goalPurple").style.display = "block";
+        document.getElementById("goalOne").style.display = "none";
 
         var center_station = goal_station_name_ID.shift();
         var nearest_hub_station = goal_station_name_ID.shift();
