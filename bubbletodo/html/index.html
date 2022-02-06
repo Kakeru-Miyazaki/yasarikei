@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+
+    <title>Bubble to Do</title>
+  </head>
+  <style>
+    html {
+      user-select: none;
+    }
+  </style>
+  <link rel="stylesheet" href="./../css/modal.css" />
+
+  <body>
+    <div id="mask" class="hidden" onclick="exit()"></div>
+    <section id="modal1" class="hidden modal">
+      <p>
+        <strong class="center">セクションの追加</strong>
+        <br />
+        <input type="text" id="inputParentName" />
+        <br />
+      </p>
+      <div id="close1" class="close" onclick="registerParent()">Register</div>
+    </section>
+    <section id="modal2" class="hidden modal">
+      <p>
+        <strong><div id="parentnameOnInput"></div> </strong>
+        <br />
+        <span><span>名前</span></span>
+        <input type="text" id="inputChildrenName" />
+        <br />
+        <span><span>URL</span></span>
+        <input type="text" id="inputURL" />
+        <br />
+      </p>
+      <div id="close2" class="close" onclick="registerChildren()">Register</div>
+    </section>
+
+    <!-- <svg width="1600" height="1000"></svg> -->
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script>
+      var Sample_set = false;
+
+      var w = window,
+        d = document,
+        e = d.documentElement,
+        BODY = d.getElementsByTagName("body")[0];
+      var width = w.innerWidth || e.clientWidth || BODY.clientWidth;
+      var height = w.innerHeight || e.clientHeight || BODY.clientHeight;
+
+      var svg = d3
+        .select("body")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+      // 1. 描画用のデータ準備
+      var width = document.querySelector("svg").clientWidth;
+      var height = document.querySelector("svg").clientHeight;
+      var nodesData = [];
+      var linksData = [];
+      var nodeDict = {};
+      var parentNameSet = new Set();
+      var childrenNameSet = new Set();
+      var pname = "";
+      if (Sample_set) {
+        localStorage.clear();
+        var dataSet_ = [
+          {
+            name: "Python",
+            children: [{ name: "このQiitaよさそう" }, { name: "環境構築" }],
+          },
+          {
+            name: "AtCoder",
+            children: [
+              { name: "ABC222", url: "https://atcoder.jp/contests/abc222" },
+              { name: "セグ木拾ってくる" },
+              {
+                name: "まだ解けてない問題",
+                url: "https://atcoder.jp/contests/abc222",
+              },
+              { name: "コンテスト復習" },
+            ],
+          },
+          {
+            name: "人工知能",
+            children: [
+              { name: "録画01", url: "https://google.com" },
+              { name: "02", url: "https://google.com" },
+              { name: "03", url: "https://google.com" },
+              { name: "04", url: "https://google.com" },
+              { name: "05", url: "https://google.com" },
+              { name: "06", url: "https://google.com" },
+              { name: "07", url: "https://google.com" },
+              { name: "課題2" },
+              { name: "課題3" },
+            ],
+          },
+          {
+            name: "数理手法",
+            children: [
+              { name: "01" },
+              { name: "02" },
+              { name: "03" },
+              { name: "04" },
+              { name: "05" },
+              { name: "06" },
+              { name: "07" },
+            ],
+          },
+          {
+            name: "読みたい",
+            children: [
+              { name: "例のバグ" },
+              { name: "Docker" },
+              { name: "Ubuntuのやつ" },
+              { name: "VSCode-neovim" },
+              { name: "cssいい感じ" },
+              { name: "資格試験" },
+              { name: "ゲームのレビュー" },
+              { name: "PC Sale" },
+            ],
+          },
+          {
+            name: "To Do",
+            children: [
+              { name: "メール返す" },
+              { name: "ライン返す" },
+              { name: "DM返す" },
+              { name: "ツイートする" },
+              { name: "歯磨き粉買う" },
+            ],
+          },
+          {
+            name: "Wish List",
+            children: [
+              {
+                name: "アルセウス",
+                url: "https://www.pokemon.co.jp/ex/legends_arceus/ja/",
+              },
+              { name: "iPad Pro" },
+              { name: "Thinkpad" },
+              { name: "この本" },
+            ],
+          },
+        ];
+
+        var dataJson = JSON.stringify(dataSet_, undefined, 1);
+        localStorage.setItem("data_set", dataJson);
+      }
+
+      // localStorage.clear();
+      var tutorial_ = [
+        {
+          name: "Sample",
+          children: [
+            { name: "Click background to Add Large Bubble" },
+            { name: "Goggle", url: "https://google.com" },
+            { name: " Click × to delete me" },
+          ],
+        },
+      ];
+      if (!localStorage.hasOwnProperty("data_set")) {
+        var dataJson = JSON.stringify(tutorial_, undefined, 1);
+        localStorage.setItem("data_set", dataJson);
+      }
+      var dataSet = JSON.parse(localStorage.getItem("data_set"));
+      // dataSet = JSON.parse(dataJson);
+      var lenChildren = {};
+      var max_lenchildren = 0;
+      for (parent of dataSet) {
+        parentNameSet.add(parent.name);
+        lenChildren[parent.name] = parent.children.length;
+        max_lenchildren = Math.max(max_lenchildren, parent.children.length);
+        nodesData.push({
+          name: parent.name,
+          id: parent.name,
+          text: parent.name,
+          r: 90 + 25 * Math.round(lenChildren[parent.name] / 3 + 1.5),
+          // r: Math.max(30 * lenChildren[parent.name] + 65, 120),
+          x: width * (Math.random() * 0.6 + 0.2),
+          y: height * (Math.random() * 0.6 + 0.2),
+        });
+        var c_index = 0;
+
+        for (children of parent.children) {
+          if (children.url != null) {
+            nodesData.push({
+              name: parent.name + children.name,
+              text: children.name,
+              id: parent.name + children.name,
+              r: 50,
+              parent_name: parent.name,
+              url: children.url,
+              x: 0.2 + 0.6 * Math.random() * width,
+              y: 0.2 + 0.6 * Math.random() * height,
+            });
+          } else {
+            nodesData.push({
+              name: parent.name + children.name,
+              text: children.name,
+              id: parent.name + children.name,
+              r: 50,
+              parent_name: parent.name,
+            });
+          }
+          childrenNameSet.add(parent.name + children.name);
+          linksData.push({
+            source: parent.name,
+            target: parent.name + children.name,
+            l:
+              60 +
+              25 *
+                ((c_index % Math.round((lenChildren[parent.name] + 1) / 3)) +
+                  1),
+            // l: 20 * lenChildren[parent.name] * (0.3 + 0.7 * Math.random()),
+          });
+          c_index++;
+        }
+      }
+
+      // 2. svg要素を配置
+      // 背景
+      svg
+        .append("rect")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .on("click", function (d) {
+          appendParentBubble();
+        })
+        .attr("fill", "lightblue");
+      svg
+        .append("text")
+        .attr("id", "title")
+        .text("BUBBLE TO DO")
+        .attr("x", width / 2)
+        .attr("y", height / 2)
+        .attr("font-size", 80)
+        .attr("fill", "white")
+        .attr("text-anchor", "middle")
+        .on("click", function (d) {
+          appendParentBubble();
+        });
+
+      var color_scale = d3
+        .scaleLinear()
+        .domain([0, max_lenchildren])
+        .range(["skyblue", "darkblue"]);
+
+      var link = svg
+        .selectAll("line")
+        .data(linksData)
+        .enter()
+        .append("line")
+        .attr("stroke-width", 1)
+        .attr("stroke", "black")
+        .attr("opacity", 0.0);
+
+      var node = svg
+        .selectAll("circle")
+        .data(nodesData)
+        .enter()
+        .append("g")
+        .attr("class", "node_group")
+        .append("circle")
+        .attr("r", function (d) {
+          return d.r;
+        })
+        .attr("fill", function (d) {
+          if (d.parent_name == null) {
+            return color_scale(lenChildren[d.name]);
+          } else {
+            return color_scale(lenChildren[d.parent_name]);
+          }
+        })
+        .attr("stroke", "none")
+        .call(
+          d3
+            .drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended)
+        )
+        .attr("onclick", function (d) {
+          return d.parent_name != null;
+        })
+        .on("click", function (d) {
+          if (d.parent_name != null) {
+            if (d.url != null) {
+              window.open(d.url, "_blank").focus();
+            }
+          } else {
+            appendChildrenBubble(d);
+          }
+        })
+        .attr("opacity", function (d) {
+          if (d.parent_name == null) {
+            return 0.4;
+          } else {
+            return 0.6;
+          }
+        });
+
+      var text = svg
+        .selectAll(".node_group")
+        .append("text")
+        .attr("font-size", function (d) {
+          if (d.parent_name == null) {
+            return 30;
+          } else {
+            return 15;
+          }
+        })
+        .on("click", function (d) {
+          if (d.parent_name != null) {
+            if (d.url != null) {
+              window.open(d.url, "_blank").focus();
+            }
+          } else {
+            appendChildrenBubble(d);
+          }
+        })
+        .attr("fill", "white")
+        .text(function (d) {
+          return d.text;
+        })
+        .attr("x", function (d) {
+          return d.x;
+        })
+        .attr("y", function (d) {
+          return d.y;
+        })
+        .attr("text-anchor", "middle");
+      var deleteButton = svg
+        .selectAll(".node_group")
+        .append("text")
+        .attr("font-size", function (d) {
+          if (d.parent_name == null) {
+            return 30;
+          } else {
+            return 15;
+          }
+        })
+        .on("click", function (d) {
+          deleteBubble(d);
+        })
+        .attr("fill", "white")
+        .text(function (d) {
+          return "×";
+        })
+        .attr("x", function (d) {
+          return d.x;
+        })
+        .attr("y", function (d) {
+          return d.y;
+        })
+        .attr("opacity", 0.4)
+        .attr("text-anchor", "middle");
+
+      // var delbutton = node
+      //   .selectAll(".node_group")
+      //   .append("circle")
+      //   .attr("r", 10)
+      //   .on("click", function (d) {
+      //     if (d.url != null) {
+      //       window.open(d.url, "_blank").focus();
+      //     }
+      //   })
+      //   .attr("fill", "yellow")
+      //   .attr("x", function (d) {
+      //     return d.x + 10;
+      //   })
+      //   .attr("y", function (d) {
+      //     return d.y - 10;
+      //   });
+
+      var simulation = d3
+        .forceSimulation()
+        .force(
+          "link",
+          d3
+            .forceLink()
+            .distance(function (d) {
+              return d.l;
+            })
+            .id(function (d) {
+              return d.name;
+            })
+            .strength(0.3)
+            .iterations(16)
+        )
+        .force(
+          "collide",
+          d3
+            .forceCollide()
+            .radius(function (d) {
+              return d.r;
+            })
+            .strength(0.0)
+            // .strength(function (d) {
+            //   if (d.parent_name == null) {
+            //     return 0;
+            //   } else {
+            //     return 0.7;
+            //   }
+            // })
+            .iterations(16)
+        )
+        .force("charge", d3.forceManyBody().strength(-200))
+        .force(
+          "x",
+          d3
+            .forceX()
+            .strength(0.03)
+            .x(width / 2)
+        )
+        .force(
+          "y",
+          d3
+            .forceY()
+            .strength(0.03)
+            .y(height / 2)
+        );
+      // .force("center", d3.forceCenter(width / 2, height / 2))
+      simulation.nodes(nodesData).on("tick", ticked);
+
+      simulation
+        .force("link")
+        .links(linksData)
+        .id(function (d) {
+          return d.name;
+        });
+
+      // 4. forceSimulation 描画更新用関数
+      function ticked() {
+        link
+          .attr("x1", function (d) {
+            return d.source.x;
+          })
+          .attr("y1", function (d) {
+            return d.source.y;
+          })
+          .attr("x2", function (d) {
+            return d.target.x;
+          })
+          .attr("y2", function (d) {
+            return d.target.y;
+          });
+        node
+          .attr("cx", function (d) {
+            return d.x;
+          })
+          .attr("cy", function (d) {
+            return d.y;
+          });
+        text
+          .attr("x", function (d) {
+            return d.x;
+          })
+          .attr("y", function (d) {
+            return d.y;
+          });
+        deleteButton
+          .attr("x", function (d) {
+            return d.x + d.r / 1.414;
+          })
+          .attr("y", function (d) {
+            return d.y - d.r / 2.828;
+          });
+      }
+
+      // 5. ドラッグ時のイベント関数
+      function dragstarted(d) {
+        if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+      }
+
+      function dragged(d) {
+        d.fx = d3.event.x;
+        d.fy = d3.event.y;
+      }
+
+      function dragended(d) {
+        if (!d3.event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+      }
+
+      // 6. クリック時のイベント
+      function deleteBubble(d) {
+        var preDataset = localStorage.getItem("data_set");
+        localStorage.setItem("pre_data_set", preDataset);
+        var newDataSet_ = [];
+        for (parent of dataSet) {
+          if (parent.name != d.name) {
+            var pushContent = { name: parent.name, children: [] };
+            for (children of parent.children) {
+              if (!(children.name == d.text && parent.name == d.parent_name)) {
+                pushContent["children"].push(children);
+              } else {
+                console.log(children);
+              }
+            }
+            // console.log(pushContent.children.length);
+            if (
+              !(
+                pushContent.children.length != 0 &&
+                (pushContent.name == d.name ||
+                  pushContent.name == d.parent_name)
+              )
+            ) {
+              newDataSet_.push(pushContent);
+            }
+          }
+        }
+        var newDataSet = JSON.stringify(newDataSet_, undefined, 1);
+        localStorage.setItem("data_set", newDataSet);
+        console.log(newDataSet_);
+        windowReload();
+      }
+      function appendParentBubble(d) {
+        console.log("appendParentBubble");
+        document.getElementById("inputParentName").value = "";
+
+        document.getElementById("mask").style.display = "block";
+        document.getElementById("modal1").style.display = "block";
+      }
+
+      function appendChildrenBubble(d) {
+        pname = d.name;
+        document.getElementById("inputChildrenName").value = "";
+        document.getElementById("inputURL").value = "";
+        document.getElementById("parentnameOnInput").innerHTML =
+          pname + " への追加";
+        document.getElementById("mask").style.display = "block";
+        document.getElementById("modal2").style.display = "block";
+      }
+
+      function registerParent() {
+        console.log("register");
+        var new_parent_name = document.getElementById("inputParentName").value;
+
+        console.log(new_parent_name);
+        if (new_parent_name == "") {
+          document.getElementById("inputParentName").value = "Empty input";
+          return 1;
+        }
+        if (parentNameSet.has(new_parent_name)) {
+          document.getElementById("inputParentName").value = "Already exists";
+          return 1;
+        }
+        if (
+          new_parent_name == "Empty input" ||
+          new_parent_name == "Already exists"
+        ) {
+          return 1;
+        }
+
+        document.getElementById("mask").style.display = "none";
+        document.getElementById("modal1").style.display = "none";
+
+        var preDataset = localStorage.getItem("data_set");
+        localStorage.setItem("pre_data_set", preDataset);
+        console.log(dataSet);
+
+        var newDataSet = dataSet;
+        newDataSet.push({ name: new_parent_name, children: [] });
+        var newDataSet_ = JSON.stringify(newDataSet, undefined, 1);
+        localStorage.setItem("data_set", newDataSet_);
+        windowReload();
+      }
+
+      // pname is global val of parent name
+      function registerChildren() {
+        var new_children_name =
+          document.getElementById("inputChildrenName").value;
+        var new_children_url = document.getElementById("inputURL").value;
+
+        console.log(new_children_name);
+        if (new_children_name == "") {
+          document.getElementById("inputChilrenName").value = "Empty input";
+          return 1;
+        }
+        if (childrenNameSet.has(pname + new_children_name)) {
+          document.getElementById("inputChildrenName").value = "Already exists";
+          return 1;
+        }
+        if (
+          new_children_name == "Empty input" ||
+          new_children_name == "Already exists"
+        ) {
+          return 1;
+        }
+
+        document.getElementById("mask").style.display = "none";
+        document.getElementById("modal1").style.display = "none";
+
+        var preDataset = localStorage.getItem("data_set");
+        localStorage.setItem("pre_data_set", preDataset);
+        console.log(dataSet);
+
+        var newDataSet = dataSet;
+        // newDataSet.push({ name: new_parent_name, children: [] });
+
+        for (parent of newDataSet) {
+          if (parent.name == pname) {
+            if (new_children_url == null) {
+              parent.children.push({ name: new_children_name });
+            } else {
+              parent.children.push({
+                name: new_children_name,
+                url: new_children_url,
+              });
+            }
+          }
+        }
+
+        var newDataSet_ = JSON.stringify(newDataSet, undefined, 1);
+        localStorage.setItem("data_set", newDataSet_);
+        windowReload();
+      }
+
+      function windowReload() {
+        window.location.href = window.location.href;
+      }
+
+      function exit() {
+        document.getElementById("mask").style.display = "none";
+        document.getElementById("modal1").style.display = "none";
+        document.getElementById("modal2").style.display = "none";
+      }
+    </script>
+    <!-- <script src="./modal.js"></script> -->
+  </body>
+</html>
