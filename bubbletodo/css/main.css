@@ -1,7 +1,12 @@
 #undoicon {
   position: absolute;
-  right: 50px;
-  bottom: 50px;
+  left: 25px;
+  top: 30px;
+}
+#redoicon {
+  position: absolute;
+  left: 80px;
+  top: 30px;
 }
 
 #colorTheme {
@@ -14,5 +19,5 @@
 body {
   height: auto;
   width: auto;
-  background-color: "red";
+  /* background-color: "red"; */
 }
